@@ -116,7 +116,7 @@ class Game(private val condition: GameCondition) {
         while (board.isGameOngoing()) {
             println()
             println(board)
-            print("$currTurn の番です... ")
+            print("$currTurn の番です...  ")
 
             val before: Instant = Instant.now()
 
@@ -166,7 +166,7 @@ class Game(private val condition: GameCondition) {
         print("ゲームが終了しました。")
         val winner = board.winner()
         if (winner === null) println("引き分けです。")
-        else println("$winner の勝ちです。 " +
+        else println(" $winner の勝ちです。 " +
                 "${Color.BLACK}:${board.count(Color.BLACK)}, ${Color.WHITE}:${board.count(Color.WHITE)}")
         return winner
     }
