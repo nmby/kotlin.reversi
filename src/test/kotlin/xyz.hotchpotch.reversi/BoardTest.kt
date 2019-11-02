@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 internal class BoardTest {
     companion object {
         @JvmStatic
-        fun boards(): List<Board> = listOf(boardOf(), mutableBoardOf())
+        private fun boards(): List<Board> = listOf(boardOf(), mutableBoardOf())
     }
 
     @ParameterizedTest

@@ -32,7 +32,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         val deadline: Instant = deadline(now, board, millisInGame)
         while (Instant.now() < deadline) {
             val wins: Map<Point, Long> = availables.associateWith { tryOut(board, it) }
-            availables.forEach { totalWins[it] = (totalWins[it] ?: 0) + wins[it]!! }
+            availables.forEach { totalWins[it] = (totalWins[it] ?: 0) + (wins[it] ?: 0) }
         }
 
         // 時間がなく一度も施行できなかった場合はプロキシに委ねる。

@@ -82,15 +82,15 @@ data class GameCondition(
 }
 
 class Game(private val condition: GameCondition) {
-    private val players: Map<Color, Player> = mapOf(
-            Color.BLACK to createPlayer(condition.playerBlack, Color.BLACK, condition.millisInGame, condition.millisInTurn),
-            Color.WHITE to createPlayer(condition.playerWhite, Color.WHITE, condition.millisInGame, condition.millisInTurn)
-    )
+    private val playerBlack: Player =
+            createPlayer(condition.playerBlack, Color.BLACK, condition.millisInGame, condition.millisInTurn)
+    private val playerWhite: Player =
+            createPlayer(condition.playerWhite, Color.WHITE, condition.millisInGame, condition.millisInTurn)
 
-    private val remainingMillisInGame: MutableMap<Color, Long> = mutableMapOf(
-            Color.BLACK to condition.millisInGame,
-            Color.WHITE to condition.millisInGame
-    )
+    private fun player(color: Color): Player = if (color === Color.BLACK) playerBlack else playerWhite
+
+    private var remainingMillisBlack: Long = condition.millisInGame
+    private var remainingMillisWhite: Long = condition.millisInGame
 
     private val board: MutableBoard = mutableBoardOf()
     private var currTurn: Color = Color.BLACK
@@ -108,37 +108,39 @@ class Game(private val condition: GameCondition) {
 
             val before: Instant = Instant.now()
 
-            // TODO: 別スレッドタスク化を検討
+            val remainingMillis: Long =
+                    if (currTurn === Color.BLACK) remainingMillisBlack else remainingMillisWhite
             val chosen: Point?
             try {
-                // お勉強MEMO: この「!!」はみっともないのでどうにかしたい。javaでいうEnumMapみたいのは無いか？
-                chosen = players[currTurn]!!
-                        .choosePoint(board.toBoard(), remainingMillisInGame[currTurn]!!)
+                // TODO: 別スレッドタスク化を検討
+                chosen = player(currTurn).choosePoint(board.toBoard(), remainingMillis)
 
             } catch (e: Exception) {
-                println("$currTurn の思考中に例外が発生しました。$currTurn の負けです。")
+                println("$currTurn の思考中に例外が発生しました。 $currTurn の負けです。")
                 e.printStackTrace()
                 return currTurn.reversed()
             }
 
-            val millisPassed: Long = Duration.between(before, Instant.now()).toMillis()
+            val passedMillis: Long = Duration.between(before, Instant.now()).toMillis()
 
-            print("${chosen ?: "PASS"} が選択されました。（経過時間 : ${millisPassed}ミリ秒）")
+            print("${chosen ?: "PASS"} が選択されました。（経過時間 : ${passedMillis}ミリ秒）")
             if (condition.automatic) println() else readLine()
 
-            if (condition.millisInTurn < millisPassed) {
-                println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を超過しました。$currTurn の負けです。")
+            if (condition.millisInTurn < passedMillis) {
+                println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を超過しました。 $currTurn の負けです。")
                 return currTurn.reversed()
             }
-            remainingMillisInGame[currTurn] = remainingMillisInGame[currTurn]!! - millisPassed
-            if (remainingMillisInGame[currTurn]!! < 0) {
-                println("ゲーム内の持ち時間を超過しました。$currTurn の負けです。")
+            if (remainingMillis < passedMillis) {
+                println("ゲーム内の持ち時間を超過しました。 $currTurn の負けです。\n" +
+                        "（持ち時間${condition.millisInGame}ミリ秒を${passedMillis - remainingMillis}ミリ秒超過）")
                 return currTurn.reversed()
             }
+            if (currTurn === Color.BLACK) remainingMillisBlack -= passedMillis
+            else remainingMillisWhite -= passedMillis
 
             val move = Move(currTurn, chosen)
             if (!board.canApply(move)) {
-                println("ルール違反の手が指定されました。$currTurn の負けです。")
+                println("ルール違反の手が指定されました。 $currTurn の負けです。")
                 return currTurn.reversed()
             }
 

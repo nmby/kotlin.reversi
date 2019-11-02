@@ -3,18 +3,19 @@ package xyz.hotchpotch.reversi
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
+import xyz.hotchpotch.reversi.Color.*
 
 internal class ColorTest {
 
     @Test
     fun reversed() {
-        assertSame(Color.WHITE, Color.BLACK.reversed())
-        assertSame(Color.BLACK, Color.WHITE.reversed())
+        assertSame(WHITE, BLACK.reversed())
+        assertSame(BLACK, WHITE.reversed())
     }
 
     @Test
     fun testToString() {
-        assertEquals("●", Color.BLACK.toString())
-        assertEquals("○", Color.WHITE.toString())
+        assertEquals("●", with(BLACK) { toString() })
+        assertEquals("○", with(WHITE) { toString() })
     }
 }
