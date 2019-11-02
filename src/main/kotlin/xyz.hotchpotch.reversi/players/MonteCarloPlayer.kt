@@ -9,7 +9,7 @@ import java.util.stream.Stream
 
 // 残り時間や処理性能とかに応じてここを可変にするとより良くなるんだろうけど
 // 面倒なので今回はこれで。
-private const val TIMES: Int = 30
+private const val TIMES: Int = 25
 private const val MARGIN: Long = 45
 
 class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long) : Player {
