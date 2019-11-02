@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 internal class BoardTest {
     companion object {
         @JvmStatic
-        fun boards(): List<Board> = listOf(boardOf(), mutableBoardOf())
+        private fun boards(): List<Board> = listOf(boardOf(), mutableBoardOf())
     }
 
     @ParameterizedTest
@@ -27,18 +27,21 @@ internal class BoardTest {
 
         // toString() のテスト
         assertEquals(
-            (""
-                    + "  a b c d e f g h %n"
-                    + "1 ・・・・・・・・%n"
-                    + "2 ・・・・・・・・%n"
-                    + "3 ・・・・・・・・%n"
-                    + "4 ・・・○●・・・%n"
-                    + "5 ・・・●○・・・%n"
-                    + "6 ・・・・・・・・%n"
-                    + "7 ・・・・・・・・%n"
-                    + "8 ・・・・・・・・%n").format(),
-            board.toString()
+                (""
+                        + "  a b c d e f g h %n"
+                        + "1 ・・・・・・・・%n"
+                        + "2 ・・・・・・・・%n"
+                        + "3 ・・・・・・・・%n"
+                        + "4 ・・・○●・・・%n"
+                        + "5 ・・・●○・・・%n"
+                        + "6 ・・・・・・・・%n"
+                        + "7 ・・・・・・・・%n"
+                        + "8 ・・・・・・・・%n").format(),
+                board.toString()
         )
+
+        assertEquals(2, board.count(Color.BLACK))
+        assertEquals(2, board.count(Color.WHITE))
     }
 
     @Test
@@ -69,60 +72,60 @@ internal class BoardTest {
         Point.values().forEach {
             when (it.pos) {
                 "d3" -> assertEquals(
-                    (""
-                            + "  a b c d e f g h %n"
-                            + "1 ・・・・・・・・%n"
-                            + "2 ・・・・・・・・%n"
-                            + "3 ・・・●・・・・%n"
-                            + "4 ・・・●●・・・%n"
-                            + "5 ・・・●○・・・%n"
-                            + "6 ・・・・・・・・%n"
-                            + "7 ・・・・・・・・%n"
-                            + "8 ・・・・・・・・%n"
-                            ).format(),
-                    (board + Move(Color.BLACK, it)).toString()
+                        (""
+                                + "  a b c d e f g h %n"
+                                + "1 ・・・・・・・・%n"
+                                + "2 ・・・・・・・・%n"
+                                + "3 ・・・●・・・・%n"
+                                + "4 ・・・●●・・・%n"
+                                + "5 ・・・●○・・・%n"
+                                + "6 ・・・・・・・・%n"
+                                + "7 ・・・・・・・・%n"
+                                + "8 ・・・・・・・・%n"
+                                ).format(),
+                        (board + Move(Color.BLACK, it)).toString()
                 )
                 "c4" -> assertEquals(
-                    (""
-                            + "  a b c d e f g h %n"
-                            + "1 ・・・・・・・・%n"
-                            + "2 ・・・・・・・・%n"
-                            + "3 ・・・・・・・・%n"
-                            + "4 ・・●●●・・・%n"
-                            + "5 ・・・●○・・・%n"
-                            + "6 ・・・・・・・・%n"
-                            + "7 ・・・・・・・・%n"
-                            + "8 ・・・・・・・・%n"
-                            ).format(),
-                    (board + Move(Color.BLACK, it)).toString()
+                        (""
+                                + "  a b c d e f g h %n"
+                                + "1 ・・・・・・・・%n"
+                                + "2 ・・・・・・・・%n"
+                                + "3 ・・・・・・・・%n"
+                                + "4 ・・●●●・・・%n"
+                                + "5 ・・・●○・・・%n"
+                                + "6 ・・・・・・・・%n"
+                                + "7 ・・・・・・・・%n"
+                                + "8 ・・・・・・・・%n"
+                                ).format(),
+                        (board + Move(Color.BLACK, it)).toString()
                 )
                 "f5" -> assertEquals(
-                    (""
-                            + "  a b c d e f g h %n"
-                            + "1 ・・・・・・・・%n"
-                            + "2 ・・・・・・・・%n"
-                            + "3 ・・・・・・・・%n"
-                            + "4 ・・・○●・・・%n"
-                            + "5 ・・・●●●・・%n"
-                            + "6 ・・・・・・・・%n"
-                            + "7 ・・・・・・・・%n"
-                            + "8 ・・・・・・・・%n"
-                            ).format(),
-                    (board + Move(Color.BLACK, it)).toString()
+                        (""
+                                + "  a b c d e f g h %n"
+                                + "1 ・・・・・・・・%n"
+                                + "2 ・・・・・・・・%n"
+                                + "3 ・・・・・・・・%n"
+                                + "4 ・・・○●・・・%n"
+                                + "5 ・・・●●●・・%n"
+                                + "6 ・・・・・・・・%n"
+                                + "7 ・・・・・・・・%n"
+                                + "8 ・・・・・・・・%n"
+                                ).format(),
+                        (board + Move(Color.BLACK, it)).toString()
                 )
                 "e6" -> assertEquals(
-                    (""
-                            + "  a b c d e f g h %n"
-                            + "1 ・・・・・・・・%n"
-                            + "2 ・・・・・・・・%n"
-                            + "3 ・・・・・・・・%n"
-                            + "4 ・・・○●・・・%n"
-                            + "5 ・・・●●・・・%n"
-                            + "6 ・・・・●・・・%n"
-                            + "7 ・・・・・・・・%n"
-                            + "8 ・・・・・・・・%n"
-                            ).format(),
-                    (board + Move(Color.BLACK, it)).toString()
+                        (""
+                                + "  a b c d e f g h %n"
+                                + "1 ・・・・・・・・%n"
+                                + "2 ・・・・・・・・%n"
+                                + "3 ・・・・・・・・%n"
+                                + "4 ・・・○●・・・%n"
+                                + "5 ・・・●●・・・%n"
+                                + "6 ・・・・●・・・%n"
+                                + "7 ・・・・・・・・%n"
+                                + "8 ・・・・・・・・%n"
+                                ).format(),
+                        (board + Move(Color.BLACK, it)).toString()
                 )
                 else -> assertThrows(IllegalArgumentException::class.java)
                 { assertNull(board + Move(Color.BLACK, it)) }
@@ -130,18 +133,18 @@ internal class BoardTest {
 
             // 二手目は代表1パターンのみ
             assertEquals(
-                (""
-                        + "  a b c d e f g h %n"
-                        + "1 ・・・・・・・・%n"
-                        + "2 ・・・・・・・・%n"
-                        + "3 ・・○●・・・・%n"
-                        + "4 ・・・○●・・・%n"
-                        + "5 ・・・●○・・・%n"
-                        + "6 ・・・・・・・・%n"
-                        + "7 ・・・・・・・・%n"
-                        + "8 ・・・・・・・・%n"
-                        ).format(),
-                (board + Move(Color.BLACK, Point["d3"]) + Move(Color.WHITE, Point["c3"])).toString()
+                    (""
+                            + "  a b c d e f g h %n"
+                            + "1 ・・・・・・・・%n"
+                            + "2 ・・・・・・・・%n"
+                            + "3 ・・○●・・・・%n"
+                            + "4 ・・・○●・・・%n"
+                            + "5 ・・・●○・・・%n"
+                            + "6 ・・・・・・・・%n"
+                            + "7 ・・・・・・・・%n"
+                            + "8 ・・・・・・・・%n"
+                            ).format(),
+                    (board + Move(Color.BLACK, Point["d3"]) + Move(Color.WHITE, Point["c3"])).toString()
             )
         }
     }
@@ -158,52 +161,52 @@ internal class BoardTest {
         // 正常系：一手目
         board.apply(Move(Color.BLACK, Point["f5"]))
         assertEquals(
-            (""
-                    + "  a b c d e f g h %n"
-                    + "1 ・・・・・・・・%n"
-                    + "2 ・・・・・・・・%n"
-                    + "3 ・・・・・・・・%n"
-                    + "4 ・・・○●・・・%n"
-                    + "5 ・・・●●●・・%n"
-                    + "6 ・・・・・・・・%n"
-                    + "7 ・・・・・・・・%n"
-                    + "8 ・・・・・・・・%n"
-                    ).format(),
-            board.toString()
+                (""
+                        + "  a b c d e f g h %n"
+                        + "1 ・・・・・・・・%n"
+                        + "2 ・・・・・・・・%n"
+                        + "3 ・・・・・・・・%n"
+                        + "4 ・・・○●・・・%n"
+                        + "5 ・・・●●●・・%n"
+                        + "6 ・・・・・・・・%n"
+                        + "7 ・・・・・・・・%n"
+                        + "8 ・・・・・・・・%n"
+                        ).format(),
+                board.toString()
         )
 
         // 正常系：二手目
         board.apply(Move(Color.WHITE, Point["f4"]))
         assertEquals(
-            (""
-                    + "  a b c d e f g h %n"
-                    + "1 ・・・・・・・・%n"
-                    + "2 ・・・・・・・・%n"
-                    + "3 ・・・・・・・・%n"
-                    + "4 ・・・○○○・・%n"
-                    + "5 ・・・●●●・・%n"
-                    + "6 ・・・・・・・・%n"
-                    + "7 ・・・・・・・・%n"
-                    + "8 ・・・・・・・・%n"
-                    ).format(),
-            board.toString()
+                (""
+                        + "  a b c d e f g h %n"
+                        + "1 ・・・・・・・・%n"
+                        + "2 ・・・・・・・・%n"
+                        + "3 ・・・・・・・・%n"
+                        + "4 ・・・○○○・・%n"
+                        + "5 ・・・●●●・・%n"
+                        + "6 ・・・・・・・・%n"
+                        + "7 ・・・・・・・・%n"
+                        + "8 ・・・・・・・・%n"
+                        ).format(),
+                board.toString()
         )
 
         // 正常系：三手目
         board.apply(Move(Color.BLACK, Point["f3"]))
         assertEquals(
-            (""
-                    + "  a b c d e f g h %n"
-                    + "1 ・・・・・・・・%n"
-                    + "2 ・・・・・・・・%n"
-                    + "3 ・・・・・●・・%n"
-                    + "4 ・・・○●●・・%n"
-                    + "5 ・・・●●●・・%n"
-                    + "6 ・・・・・・・・%n"
-                    + "7 ・・・・・・・・%n"
-                    + "8 ・・・・・・・・%n"
-                    ).format(),
-            board.toString()
+                (""
+                        + "  a b c d e f g h %n"
+                        + "1 ・・・・・・・・%n"
+                        + "2 ・・・・・・・・%n"
+                        + "3 ・・・・・●・・%n"
+                        + "4 ・・・○●●・・%n"
+                        + "5 ・・・●●●・・%n"
+                        + "6 ・・・・・・・・%n"
+                        + "7 ・・・・・・・・%n"
+                        + "8 ・・・・・・・・%n"
+                        ).format(),
+                board.toString()
         )
     }
 
@@ -215,40 +218,42 @@ internal class BoardTest {
         board.apply(Move(Color.BLACK, Point["d3"]))
         board.apply(Move(Color.BLACK, Point["e6"]))
         assert(
-            board.toString() == (""
-                    + "  a b c d e f g h %n"
-                    + "1 ・・・・・・・・%n"
-                    + "2 ・・・・・・・・%n"
-                    + "3 ・・・●・・・・%n"
-                    + "4 ・・・●●・・・%n"
-                    + "5 ・・・●●・・・%n"
-                    + "6 ・・・・●・・・%n"
-                    + "7 ・・・・・・・・%n"
-                    + "8 ・・・・・・・・%n").format()
+                board.toString() == (""
+                        + "  a b c d e f g h %n"
+                        + "1 ・・・・・・・・%n"
+                        + "2 ・・・・・・・・%n"
+                        + "3 ・・・●・・・・%n"
+                        + "4 ・・・●●・・・%n"
+                        + "5 ・・・●●・・・%n"
+                        + "6 ・・・・●・・・%n"
+                        + "7 ・・・・・・・・%n"
+                        + "8 ・・・・・・・・%n").format()
         )
 
         // テスト
         val move = Move(Color.BLACK, Point["a1"])
         assertThrows(java.lang.IllegalArgumentException::class.java) { board.apply(move) }
         assertThrows(java.lang.IllegalArgumentException::class.java) { board + move }
+        assertEquals(6, board.count(Color.BLACK))
+        assertEquals(0, board.count(Color.WHITE))
     }
 
     @Test
     fun pass() {
         // 白にとってパスの状態のリバーシ盤。
         val board: MutableBoard =
-            boardOf(mapOf(Point["a1"] to Color.BLACK, Point["b1"] to Color.WHITE)).toMutableBoard()
+                boardOf(mapOf(Point["a1"] to Color.BLACK, Point["b1"] to Color.WHITE)).toMutableBoard()
         assert(
-            board.toString() == (""
-                    + "  a b c d e f g h %n"
-                    + "1 ●○・・・・・・%n"
-                    + "2 ・・・・・・・・%n"
-                    + "3 ・・・・・・・・%n"
-                    + "4 ・・・・・・・・%n"
-                    + "5 ・・・・・・・・%n"
-                    + "6 ・・・・・・・・%n"
-                    + "7 ・・・・・・・・%n"
-                    + "8 ・・・・・・・・%n").format()
+                board.toString() == (""
+                        + "  a b c d e f g h %n"
+                        + "1 ●○・・・・・・%n"
+                        + "2 ・・・・・・・・%n"
+                        + "3 ・・・・・・・・%n"
+                        + "4 ・・・・・・・・%n"
+                        + "5 ・・・・・・・・%n"
+                        + "6 ・・・・・・・・%n"
+                        + "7 ・・・・・・・・%n"
+                        + "8 ・・・・・・・・%n").format()
         )
 
         // テスト
@@ -291,4 +296,4 @@ internal class BoardTest {
     }
 }
 
-private class TestBoard(val proxy: Board): Board by proxy
+private class TestBoard(val proxy: Board) : Board by proxy

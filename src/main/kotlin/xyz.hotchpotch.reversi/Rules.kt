@@ -4,7 +4,7 @@ package xyz.hotchpotch.reversi
 // このファイルの内容は Board.kt に記述してしまっても良いものだが、
 // 「リバーシ盤上のどこに石を置けるか」「どの石をひっくり返せるか」というルールロジックのみ
 // 切り出してみることにした。
-// というか、拡張を使ってみたかっただけとう話もある。
+// というか、拡張を使ってみたかっただけという話もある。
 
 /**
  * @return このリバーシ盤がゲーム継続中の場合（まだ石を置ける位置がある場合）に true を返します。
@@ -15,14 +15,14 @@ fun Board.isGameOngoing(): Boolean = canPut(Color.BLACK) || canPut(Color.WHITE)
  * @param color 石の色
  * @return このリバーシ盤に指定された色の石を置ける位置がある場合に true を返します。
  */
-fun Board.canPut(color: Color): Boolean = Point.values().any { canPut(color, it) }
+fun Board.canPut(color: Color): Boolean = Point.values().any { canPutAt(color, it) }
 
 /**
  * @param color 石の色
  * @param point 石を置く位置
  * @return このリバーシ盤の指定された位置に指定された色の石を置ける場合に true を返します。
  */
-fun Board.canPut(color: Color, point: Point): Boolean = this[point] === null
+fun Board.canPutAt(color: Color, point: Point): Boolean = this[point] === null
         && Direction.values().any { reversibles(color, point, it).isNotEmpty() }
 
 /**
@@ -30,7 +30,7 @@ fun Board.canPut(color: Color, point: Point): Boolean = this[point] === null
  * @return このリバーシ盤に指定された手を適用できる場合に true を返します。
  */
 fun Board.canApply(move: Move): Boolean = isGameOngoing()
-        && if (move.isPass()) !canPut(move.color) else canPut(move.color, move.point!!)
+        && if (move.isPass()) !canPut(move.color) else canPutAt(move.color, move.point!!)
 
 /**
  * @param color 石の色
@@ -64,8 +64,8 @@ private fun Board.reversibles(color: Color, point: Point, direction: Direction):
  */
 fun Board.winner(): Color? {
     check(!isGameOngoing()) { "まだゲーム継続中です。" }
-    val black: Int = Point.values().count { this[it] === Color.BLACK }
-    val white: Int = Point.values().count { this[it] === Color.WHITE }
+    val black: Int = count(Color.BLACK)
+    val white: Int = count(Color.WHITE)
     return when {
         white < black -> Color.BLACK
         black < white -> Color.WHITE

@@ -29,6 +29,11 @@ interface Board {
      * @return このリバーシ盤の変更可能コピーを生成して返します。
      */
     fun toMutableBoard(): MutableBoard = mutableBoardOf(this)
+
+    /**
+     * @return このリバーシ盤上の指定された色の石の数を返します。
+     */
+    fun count(color: Color): Int = toMap().values.count { it === color }
 }
 
 /**
@@ -68,39 +73,36 @@ fun mutableBoardOf(original: Board): MutableBoard = MutableBoardImpl(original)
 internal fun boardOf(map: Map<Point, Color>): Board = BoardImpl(map)
 
 private fun Board.toMap(): Map<Point, Color> =
-    // MEMO: スマートキャストいまいち。警告がうるさいな・・・
-    Point.values().filter { this[it] !== null }.associateWith { this[it] } as Map<Point, Color>
+        Point.values().filter { this[it] !== null }.associateWith { this[it]!! }
 
 private val initMap: Map<Point, Color> = mapOf(
-    Point[(Point.HEIGHT - 1) / 2, (Point.WIDTH - 1) / 2] to Color.WHITE,
-    Point[Point.HEIGHT / 2, Point.WIDTH / 2] to Color.WHITE,
-    Point[(Point.HEIGHT - 1) / 2, Point.WIDTH / 2] to Color.BLACK,
-    Point[Point.HEIGHT / 2, (Point.WIDTH - 1) / 2] to Color.BLACK
+        Point[(Point.HEIGHT - 1) / 2, (Point.WIDTH - 1) / 2] to Color.WHITE,
+        Point[Point.HEIGHT / 2, Point.WIDTH / 2] to Color.WHITE,
+        Point[(Point.HEIGHT - 1) / 2, Point.WIDTH / 2] to Color.BLACK,
+        Point[Point.HEIGHT / 2, (Point.WIDTH - 1) / 2] to Color.BLACK
 )
 
 private open class BoardImpl : Board {
 
     // お勉強MEMO:
-    // BoardImpl は読み取り専用なので不変にしたく、実際にそうした。
-    // 一方、map を open にすることは MutableMap でオーバーライドされ得、実際に BoardImpl でそうしている。
-    // 不変性が破られる危険を招く非常に危ういものだが、
-    // 現在のコードは問題なく、かつ BoardImpl は private でよそで勝手にオーバーライドされることはないので、
-    // まぁ良しとする。でも気持ち悪い。
-    protected open val map: Map<Point, Color>
+    // このプロパティを open にせず、かつ BoardImpl と共用できるよう、
+    // BoardImpl.map は Map　として MutableBoardImpl.map は MutableMap にオーバーライドするのではなく、
+    // 最初から MutableMap にしてしまうことにした。
+    protected val map: MutableMap<Point, Color>
 
     constructor() {
         // Accessing non-final property 警告がうるさいな・・・　どうするのが良いんだろう
-        map = initMap
+        map = initMap.toMutableMap()
     }
 
     constructor(map: Map<Point, Color>) {
-        this.map = map.toMap()
+        this.map = map.toMutableMap()
     }
 
     constructor(original: Board) {
         map = when (original) {
-            is BoardImpl -> original.map.toMap()
-            else -> original.toMap()
+            is BoardImpl -> original.map.toMutableMap()
+            else -> original.toMap().toMutableMap()
         }
     }
 
@@ -144,8 +146,6 @@ private open class BoardImpl : Board {
 }
 
 private class MutableBoardImpl : BoardImpl, MutableBoard {
-    override val map: MutableMap<Point, Color> = super.map.toMutableMap()
-
     constructor() : super()
     constructor(original: Board) : super(original)
 

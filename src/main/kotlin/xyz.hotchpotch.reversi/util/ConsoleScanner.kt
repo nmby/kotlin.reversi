@@ -7,10 +7,10 @@ private const val DEFAULT_PROMPT: String = "> "
 private const val DEFAULT_CAUTION: String = "入力形式が不正です。再入力してください。"
 
 class ConsoleScanner<out T>(
-    private val judge: (String) -> Boolean,
-    private val converter: (String) -> T,
-    private val prompt: String = DEFAULT_PROMPT,
-    private val caution: String = DEFAULT_CAUTION
+        private val judge: (String) -> Boolean,
+        private val converter: (String) -> T,
+        private val prompt: String = DEFAULT_PROMPT,
+        private val caution: String = DEFAULT_CAUTION
 ) {
 
     companion object {
@@ -24,14 +24,14 @@ class ConsoleScanner<out T>(
          * @return 指定した形式の文字列を取得するスキャナー
          */
         fun forString(
-            pattern: Pattern,
-            prompt: String = DEFAULT_PROMPT,
-            caution: String = DEFAULT_CAUTION
+                pattern: Pattern,
+                prompt: String = DEFAULT_PROMPT,
+                caution: String = DEFAULT_CAUTION
         ): ConsoleScanner<String> = ConsoleScanner(
-            judge = pattern.asPredicate()::test,
-            converter = { it },
-            prompt = prompt,
-            caution = caution
+                judge = pattern.asPredicate()::test,
+                converter = { it },
+                prompt = prompt,
+                caution = caution
         )
 
         /**
@@ -44,21 +44,21 @@ class ConsoleScanner<out T>(
          * @return 指定した範囲の整数を取得するスキャナー
          */
         fun forInt(
-            startInclusive: Int,
-            endInclusive: Int,
-            prompt: String = "${startInclusive}～${endInclusive} の範囲の数値を入力してください > ",
-            caution: String = DEFAULT_CAUTION
+                startInclusive: Int,
+                endInclusive: Int,
+                prompt: String = "${startInclusive}～${endInclusive} の範囲の数値を入力してください > ",
+                caution: String = DEFAULT_CAUTION
         ): ConsoleScanner<Int> = ConsoleScanner(
-            judge = {
-                try {
-                    it.toInt() in startInclusive..endInclusive
-                } catch (e: NumberFormatException) {
-                    false
-                }
-            },
-            converter = String::toInt,
-            prompt = prompt,
-            caution = caution
+                judge = {
+                    try {
+                        it.toInt() in startInclusive..endInclusive
+                    } catch (e: NumberFormatException) {
+                        false
+                    }
+                },
+                converter = String::toInt,
+                prompt = prompt,
+                caution = caution
         )
 
         /**
@@ -72,21 +72,21 @@ class ConsoleScanner<out T>(
          */
         // MEMO: IntとLongの2回書かなくてよい方法、何かないのかしら・・・
         fun forLong(
-            startInclusive: Long,
-            endInclusive: Long,
-            prompt: String = "${startInclusive}～${endInclusive} の範囲の数値を入力してください > ",
-            caution: String = DEFAULT_CAUTION
+                startInclusive: Long,
+                endInclusive: Long,
+                prompt: String = "${startInclusive}～${endInclusive} の範囲の数値を入力してください > ",
+                caution: String = DEFAULT_CAUTION
         ): ConsoleScanner<Long> = ConsoleScanner(
-            judge = {
-                try {
-                    it.toLong() in startInclusive..endInclusive
-                } catch (e: NumberFormatException) {
-                    false
-                }
-            },
-            converter = String::toLong,
-            prompt = prompt,
-            caution = caution
+                judge = {
+                    try {
+                        it.toLong() in startInclusive..endInclusive
+                    } catch (e: NumberFormatException) {
+                        false
+                    }
+                },
+                converter = String::toLong,
+                prompt = prompt,
+                caution = caution
         )
 
         /**
@@ -98,26 +98,26 @@ class ConsoleScanner<out T>(
          * @return 指定されたリストの中から１つの要素を選択させるスキャナー
          */
         fun <U> forList(
-            list: List<U>,
-            prompt: String = {
-                val str: StringBuilder = StringBuilder()
-                str.appendln("以下の中から番号で選択してください。")
-                list.forEachIndexed { idx, item -> str.appendln("\t${idx + 1} : $item") }
-                str.append("> ")
-                str.toString()
-            }(),
-            caution: String = DEFAULT_CAUTION
+                list: List<U>,
+                prompt: String = {
+                    val str: StringBuilder = StringBuilder()
+                    str.appendln("以下の中から番号で選択してください。")
+                    list.forEachIndexed { idx, item -> str.appendln("\t${idx + 1} : $item") }
+                    str.append("> ")
+                    str.toString()
+                }(),
+                caution: String = DEFAULT_CAUTION
         ): ConsoleScanner<U> = ConsoleScanner(
-            judge = {
-                try {
-                    it.toInt() in 1..list.lastIndex + 1
-                } catch (e: NumberFormatException) {
-                    false
-                }
-            },
-            converter = { list[it.toInt() - 1] },
-            prompt = prompt,
-            caution = caution
+                judge = {
+                    try {
+                        it.toInt() in 1..list.lastIndex + 1
+                    } catch (e: NumberFormatException) {
+                        false
+                    }
+                },
+                converter = { list[it.toInt() - 1] },
+                prompt = prompt,
+                caution = caution
         )
 
         /**
@@ -129,27 +129,27 @@ class ConsoleScanner<out T>(
          * @return 指定された列挙型の要素の中から１つを選択させるスキャナー
          */
         fun <U : Enum<out U>> forEnum(
-            enumClass: KClass<U>,
-            prompt: String = {
-                val enumMembers = enumClass.java.enumConstants
-                val str: StringBuilder = StringBuilder()
-                str.appendln("以下の中から番号で選択してください。")
-                enumMembers.forEachIndexed { idx, item -> str.appendln("\t${idx + 1} : $item") }
-                str.append("> ")
-                str.toString()
-            }(),
-            caution: String = DEFAULT_CAUTION
+                enumClass: KClass<U>,
+                prompt: String = {
+                    val enumMembers = enumClass.java.enumConstants
+                    val str: StringBuilder = StringBuilder()
+                    str.appendln("以下の中から番号で選択してください。")
+                    enumMembers.forEachIndexed { idx, item -> str.appendln("\t${idx + 1} : $item") }
+                    str.append("> ")
+                    str.toString()
+                }(),
+                caution: String = DEFAULT_CAUTION
         ): ConsoleScanner<U> = ConsoleScanner(
-            judge = {
-                try {
-                    it.toInt() in 1..enumClass.java.enumConstants.lastIndex
-                } catch (e: NumberFormatException) {
-                    false
-                }
-            },
-            converter = { enumClass.java.enumConstants[it.toInt() - 1] },
-            prompt = prompt,
-            caution = caution
+                judge = {
+                    try {
+                        it.toInt() in 1..enumClass.java.enumConstants.lastIndex + 1
+                    } catch (e: NumberFormatException) {
+                        false
+                    }
+                },
+                converter = { enumClass.java.enumConstants[it.toInt() - 1] },
+                prompt = prompt,
+                caution = caution
         )
     }
 

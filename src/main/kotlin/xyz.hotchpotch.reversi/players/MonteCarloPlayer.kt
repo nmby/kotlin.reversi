@@ -9,7 +9,7 @@ import java.util.stream.Stream
 
 // 残り時間や処理性能とかに応じてここを可変にするとより良くなるんだろうけど
 // 面倒なので今回はこれで。
-private const val TIMES: Int = 30
+private const val TIMES: Int = 25
 private const val MARGIN: Long = 45
 
 class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long) : Player {
@@ -18,13 +18,13 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
 
     companion object : PlayerFactory {
         override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
-            MonteCarloPlayer(color, millisInTurn)
+                MonteCarloPlayer(color, millisInTurn)
     }
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
         val now: Instant = Instant.now()
 
-        val availables = Point.values().filter { board.canPut(color, it) }
+        val availables = Point.values().filter { board.canPutAt(color, it) }
         if (availables.isEmpty()) return null
         else if (availables.size == 1) return availables[0]
 
@@ -32,7 +32,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         val deadline: Instant = deadline(now, board, millisInGame)
         while (Instant.now() < deadline) {
             val wins: Map<Point, Long> = availables.associateWith { tryOut(board, it) }
-            availables.forEach { totalWins[it] = (totalWins[it] ?: 0) + wins[it]!! }
+            availables.forEach { totalWins[it] = (totalWins[it] ?: 0) + (wins[it] ?: 0) }
         }
 
         // 時間がなく一度も施行できなかった場合はプロキシに委ねる。
@@ -60,15 +60,15 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
      */
     // 本当は勝利回数だけじゃなくて引き分けの回数も考慮すると精度が上がるが、今回はまぁ良しとする。
     private fun tryOut(currBoard: Board, candidate: Point, times: Int = TIMES): Long {
-        assert(currBoard.canPut(color, candidate))
+        assert(currBoard.canPutAt(color, candidate))
 
         // ここで並列化するのが一番良いんじゃないかなー・・・　というのは根拠のない想定
         return Stream.generate { (currBoard + Move(color, candidate)).toMutableBoard() }
-            .parallel()
-            .limit(times.toLong())
-            .map { tryOut(it) }
-            .filter { it === color }
-            .count()
+                .parallel()
+                .limit(times.toLong())
+                .map { tryOut(it) }
+                .filter { it === color }
+                .count()
     }
 
     /**
@@ -81,7 +81,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         var color = color.reversed()
 
         while (board.isGameOngoing()) {
-            val availables = Point.values().filter { board.canPut(color, it) }
+            val availables = Point.values().filter { board.canPutAt(color, it) }
             if (availables.isNotEmpty()) board.apply(Move(color, availables.random()))
             color = color.reversed()
         }
