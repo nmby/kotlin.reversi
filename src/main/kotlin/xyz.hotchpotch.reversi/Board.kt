@@ -33,7 +33,7 @@ interface Board {
     /**
      * @return このリバーシ盤上の指定された色の石の数を返します。
      */
-    fun count(color: Color): Int = toMap().values.count { it === color }
+    fun count(color: Color): Int = Point.values().count { this[it] === color }
 }
 
 /**
