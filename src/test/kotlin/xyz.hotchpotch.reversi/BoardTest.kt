@@ -39,6 +39,9 @@ internal class BoardTest {
                         + "8 ・・・・・・・・%n").format(),
                 board.toString()
         )
+
+        assertEquals(2, board.count(Color.BLACK))
+        assertEquals(2, board.count(Color.WHITE))
     }
 
     @Test
@@ -231,6 +234,8 @@ internal class BoardTest {
         val move = Move(Color.BLACK, Point["a1"])
         assertThrows(java.lang.IllegalArgumentException::class.java) { board.apply(move) }
         assertThrows(java.lang.IllegalArgumentException::class.java) { board + move }
+        assertEquals(6, board.count(Color.BLACK))
+        assertEquals(0, board.count(Color.WHITE))
     }
 
     @Test

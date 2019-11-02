@@ -29,6 +29,11 @@ interface Board {
      * @return このリバーシ盤の変更可能コピーを生成して返します。
      */
     fun toMutableBoard(): MutableBoard = mutableBoardOf(this)
+
+    /**
+     * @return このリバーシ盤上の指定された色の石の数を返します。
+     */
+    fun count(color: Color): Int = toMap().values.count { it === color }
 }
 
 /**

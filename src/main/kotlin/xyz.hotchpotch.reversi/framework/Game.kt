@@ -107,7 +107,8 @@ class Game(private val condition: GameCondition) {
     private var currTurn: Color = Color.BLACK
 
     fun play(): Color? {
-        check(board.isGameOngoing()) { "Gameクラスはいわゆるワンショットです。ゲームごとに新たなインスタンスを利用してください。" }
+        check(board.isGameOngoing())
+        { "Gameクラスはいわゆるワンショットです。ゲームごとに新たなインスタンスを利用してください。" }
 
         println("ゲームを開始します。")
         println(condition)
@@ -125,9 +126,7 @@ class Game(private val condition: GameCondition) {
 
                 val chosen: Point?
                 try {
-                    // TODO: 別スレッドタスク化を検討
                     chosen = player.choosePoint(board.toBoard(), remainingMillis)
-
                 } catch (e: Exception) {
                     println("$currTurn の思考中に例外が発生しました。 $currTurn の負けです。")
                     e.printStackTrace()
@@ -139,13 +138,14 @@ class Game(private val condition: GameCondition) {
                 if (condition.automatic) println() else readLine()
 
                 if (condition.millisInTurn < passedMillis) {
-                    println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を超過しました。 $currTurn の負けです。")
+                    println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を" +
+                            "${passedMillis}ミリ秒超過しました。 $currTurn の負けです。")
                     return currTurn.reversed()
                 }
 
                 if (remainingMillis < passedMillis) {
-                    println("ゲーム内の持ち時間を超過しました。 $currTurn の負けです。\n" +
-                            "（持ち時間${condition.millisInGame}ミリ秒を${passedMillis - remainingMillis}ミリ秒超過）")
+                    println("ゲーム内の持ち時間（${condition.millisInGame}ミリ秒）を" +
+                            "${passedMillis - remainingMillis}ミリ秒超過しました。 $currTurn の負けです。")
                     return currTurn.reversed()
                 }
                 remainingMillis -= passedMillis
@@ -165,7 +165,9 @@ class Game(private val condition: GameCondition) {
         println(board)
         print("ゲームが終了しました。")
         val winner = board.winner()
-        if (winner !== null) println("$winner の勝ちです。") else println("引き分けです。")
+        if (winner === null) println("引き分けです。")
+        else println("$winner の勝ちです。 " +
+                "${Color.BLACK}:${board.count(Color.BLACK)}, ${Color.WHITE}:${board.count(Color.WHITE)}")
         return winner
     }
 }
