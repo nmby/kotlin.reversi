@@ -142,7 +142,7 @@ class ConsoleScanner<out T>(
         ): ConsoleScanner<U> = ConsoleScanner(
             judge = {
                 try {
-                    it.toInt() in 1..enumClass.java.enumConstants.lastIndex
+                    it.toInt() in 1..enumClass.java.enumConstants.lastIndex + 1
                 } catch (e: NumberFormatException) {
                     false
                 }
