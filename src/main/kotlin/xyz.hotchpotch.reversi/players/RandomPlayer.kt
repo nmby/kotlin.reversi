@@ -3,7 +3,7 @@ package xyz.hotchpotch.reversi.players
 import xyz.hotchpotch.reversi.Board
 import xyz.hotchpotch.reversi.Color
 import xyz.hotchpotch.reversi.Point
-import xyz.hotchpotch.reversi.canPut
+import xyz.hotchpotch.reversi.canPutAt
 import xyz.hotchpotch.reversi.framework.Player
 import xyz.hotchpotch.reversi.framework.PlayerFactory
 
@@ -14,7 +14,7 @@ class RandomPlayer(private val color: Color) : Player {
     }
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
-        val availables = Point.values().filter { board.canPut(color, it) }
+        val availables = Point.values().filter { board.canPutAt(color, it) }
         return if (availables.isEmpty()) null else availables.random()
     }
 }

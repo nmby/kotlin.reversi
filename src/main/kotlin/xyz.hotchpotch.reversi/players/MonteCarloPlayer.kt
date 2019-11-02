@@ -24,7 +24,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
         val now: Instant = Instant.now()
 
-        val availables = Point.values().filter { board.canPut(color, it) }
+        val availables = Point.values().filter { board.canPutAt(color, it) }
         if (availables.isEmpty()) return null
         else if (availables.size == 1) return availables[0]
 
@@ -60,7 +60,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
      */
     // 本当は勝利回数だけじゃなくて引き分けの回数も考慮すると精度が上がるが、今回はまぁ良しとする。
     private fun tryOut(currBoard: Board, candidate: Point, times: Int = TIMES): Long {
-        assert(currBoard.canPut(color, candidate))
+        assert(currBoard.canPutAt(color, candidate))
 
         // ここで並列化するのが一番良いんじゃないかなー・・・　というのは根拠のない想定
         return Stream.generate { (currBoard + Move(color, candidate)).toMutableBoard() }
@@ -81,7 +81,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         var color = color.reversed()
 
         while (board.isGameOngoing()) {
-            val availables = Point.values().filter { board.canPut(color, it) }
+            val availables = Point.values().filter { board.canPutAt(color, it) }
             if (availables.isNotEmpty()) board.apply(Move(color, availables.random()))
             color = color.reversed()
         }
