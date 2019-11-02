@@ -86,7 +86,7 @@ private open class BoardImpl : Board {
 
     // お勉強MEMO:
     // このプロパティを open にせず、かつ BoardImpl と共用できるよう、
-    // BoardImpl.map は Map　として MutableBoardImpl.map は MutableMap にオーバーライドするのではなく、
+    // BoardImpl.map は Map として MutableBoardImpl.map は MutableMap にオーバーライドするのではなく、
     // 最初から MutableMap にしてしまうことにした。
     protected val map: MutableMap<Point, Color>
 
