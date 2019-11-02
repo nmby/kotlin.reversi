@@ -82,15 +82,26 @@ data class GameCondition(
 }
 
 class Game(private val condition: GameCondition) {
-    private val playerBlack: Player =
-            createPlayer(condition.playerBlack, Color.BLACK, condition.millisInGame, condition.millisInTurn)
-    private val playerWhite: Player =
-            createPlayer(condition.playerWhite, Color.WHITE, condition.millisInGame, condition.millisInTurn)
 
-    private fun player(color: Color): Player = if (color === Color.BLACK) playerBlack else playerWhite
+    // うーむ。ちょっとトリッキー過ぎるかな。。。
+    // まぁ、こんなことも出来るんですねという実験として、今回はこれで行ってみる。
+    private interface Item {
+        val player: Player
+        var remainingMillis: Long
+    }
 
-    private var remainingMillisBlack: Long = condition.millisInGame
-    private var remainingMillisWhite: Long = condition.millisInGame
+    private val blackItem = object : Item {
+        override val player: Player =
+                // with の使いどころも考える必要がありそう。今回は実験として使ってみる。
+                with(condition) { createPlayer(playerBlack, Color.BLACK, millisInGame, millisInTurn) }
+        override var remainingMillis: Long = condition.millisInGame
+    }
+
+    private val whiteItem = object : Item {
+        override val player: Player =
+                with(condition) { createPlayer(playerWhite, Color.WHITE, millisInGame, millisInTurn) }
+        override var remainingMillis: Long = condition.millisInGame
+    }
 
     private val board: MutableBoard = mutableBoardOf()
     private var currTurn: Color = Color.BLACK
@@ -108,43 +119,45 @@ class Game(private val condition: GameCondition) {
 
             val before: Instant = Instant.now()
 
-            val remainingMillis: Long =
-                    if (currTurn === Color.BLACK) remainingMillisBlack else remainingMillisWhite
-            val chosen: Point?
-            try {
-                // TODO: 別スレッドタスク化を検討
-                chosen = player(currTurn).choosePoint(board.toBoard(), remainingMillis)
+            // あんまり広すぎる with は良くない。が、今回は実験ということで・・・
+            // with の中身をコンパイル時ではなく実行時に指定できるのは便利そう。
+            with(if (currTurn === Color.BLACK) blackItem else whiteItem) {
 
-            } catch (e: Exception) {
-                println("$currTurn の思考中に例外が発生しました。 $currTurn の負けです。")
-                e.printStackTrace()
-                return currTurn.reversed()
+                val chosen: Point?
+                try {
+                    // TODO: 別スレッドタスク化を検討
+                    chosen = player.choosePoint(board.toBoard(), remainingMillis)
+
+                } catch (e: Exception) {
+                    println("$currTurn の思考中に例外が発生しました。 $currTurn の負けです。")
+                    e.printStackTrace()
+                    return currTurn.reversed()
+                }
+                val passedMillis: Long = Duration.between(before, Instant.now()).toMillis()
+
+                print("${chosen ?: "PASS"} が選択されました。（経過時間 : ${passedMillis}ミリ秒）")
+                if (condition.automatic) println() else readLine()
+
+                if (condition.millisInTurn < passedMillis) {
+                    println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を超過しました。 $currTurn の負けです。")
+                    return currTurn.reversed()
+                }
+
+                if (remainingMillis < passedMillis) {
+                    println("ゲーム内の持ち時間を超過しました。 $currTurn の負けです。\n" +
+                            "（持ち時間${condition.millisInGame}ミリ秒を${passedMillis - remainingMillis}ミリ秒超過）")
+                    return currTurn.reversed()
+                }
+                remainingMillis -= passedMillis
+
+                val move = Move(currTurn, chosen)
+                if (!board.canApply(move)) {
+                    println("ルール違反の手が指定されました。 $currTurn の負けです。")
+                    return currTurn.reversed()
+                }
+
+                board.apply(move)
             }
-
-            val passedMillis: Long = Duration.between(before, Instant.now()).toMillis()
-
-            print("${chosen ?: "PASS"} が選択されました。（経過時間 : ${passedMillis}ミリ秒）")
-            if (condition.automatic) println() else readLine()
-
-            if (condition.millisInTurn < passedMillis) {
-                println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を超過しました。 $currTurn の負けです。")
-                return currTurn.reversed()
-            }
-            if (remainingMillis < passedMillis) {
-                println("ゲーム内の持ち時間を超過しました。 $currTurn の負けです。\n" +
-                        "（持ち時間${condition.millisInGame}ミリ秒を${passedMillis - remainingMillis}ミリ秒超過）")
-                return currTurn.reversed()
-            }
-            if (currTurn === Color.BLACK) remainingMillisBlack -= passedMillis
-            else remainingMillisWhite -= passedMillis
-
-            val move = Move(currTurn, chosen)
-            if (!board.canApply(move)) {
-                println("ルール違反の手が指定されました。 $currTurn の負けです。")
-                return currTurn.reversed()
-            }
-
-            board.apply(move)
             currTurn = currTurn.reversed()
         }
 
