@@ -12,9 +12,9 @@ import kotlin.reflect.KClass
 
 fun main() {
     val isRepeat: ConsoleScanner<Boolean> = ConsoleScanner(
-        judge = { true },
-        converter = { it == "y" },
-        prompt = "もう一度行いますか？ (y/N) > "
+            judge = { true },
+            converter = { it == "y" },
+            prompt = "もう一度行いますか？ (y/N) > "
     )
 
     do {
@@ -24,50 +24,50 @@ fun main() {
 }
 
 data class GameCondition(
-    val playerBlack: KClass<out Player>,
-    val playerWhite: KClass<out Player>,
-    val millisInGame: Long,
-    val millisInTurn: Long,
-    val automatic: Boolean = true
+        val playerBlack: KClass<out Player>,
+        val playerWhite: KClass<out Player>,
+        val millisInGame: Long,
+        val millisInTurn: Long,
+        val automatic: Boolean = true
 ) {
 
     companion object {
         fun arrangeViaConsole(): GameCondition {
 
             val playersList: String = players()
-                .mapIndexed { idx, playerClass -> "\t${idx + 1} : ${playerClass.qualifiedName}" }
-                .joinToString("\n")
+                    .mapIndexed { idx, playerClass -> "\t${idx + 1} : ${playerClass.qualifiedName}" }
+                    .joinToString("\n")
 
             val playerBlack: KClass<out Player> = ConsoleScanner.forList(
-                list = players(),
-                prompt = "${playersList}\n${Color.BLACK} のプレーヤーを番号で選択してください > "
+                    list = players(),
+                    prompt = "${playersList}\n${Color.BLACK} のプレーヤーを番号で選択してください > "
             ).get()
 
             val playerWhite: KClass<out Player> = ConsoleScanner.forList(
-                list = players(),
-                prompt = "${playersList}\n${Color.WHITE} のプレーヤーを番号で選択してください > "
+                    list = players(),
+                    prompt = "${playersList}\n${Color.WHITE} のプレーヤーを番号で選択してください > "
             ).get()
 
             val minInGame: Long = 100
             val maxInGame: Long = 1000 * 60 * 60
             val millisInGame: Long = ConsoleScanner.forLong(
-                startInclusive = minInGame,
-                endInclusive = maxInGame,
-                prompt = "ゲーム内の持ち時間（ミリ秒）を ${minInGame}～${maxInGame} の範囲で指定してください > "
+                    startInclusive = minInGame,
+                    endInclusive = maxInGame,
+                    prompt = "ゲーム内の持ち時間（ミリ秒）を ${minInGame}～${maxInGame} の範囲で指定してください > "
             ).get()
 
             val minInTurn: Long = 50
             val maxInTurn: Long = 1000 * 60 * 10
             val millisInTurn: Long = ConsoleScanner.forLong(
-                startInclusive = minInTurn,
-                endInclusive = maxInTurn,
-                prompt = "一手ごとの制限時間（ミリ秒）を ${minInTurn}～${maxInTurn} の範囲で指定してください > "
+                    startInclusive = minInTurn,
+                    endInclusive = maxInTurn,
+                    prompt = "一手ごとの制限時間（ミリ秒）を ${minInTurn}～${maxInTurn} の範囲で指定してください > "
             ).get()
 
             val automatic: Boolean = ConsoleScanner(
-                judge = { it.toLowerCase() == "y" || it.toLowerCase() == "n" },
-                converter = { it == "y" },
-                prompt = "自動モードで実行しますか？ (y/N) > "
+                    judge = { it.toLowerCase() == "y" || it.toLowerCase() == "n" },
+                    converter = { it == "y" },
+                    prompt = "自動モードで実行しますか？ (y/N) > "
             ).get()
 
             return GameCondition(playerBlack, playerWhite, millisInGame, millisInTurn, automatic)
@@ -83,13 +83,13 @@ data class GameCondition(
 
 class Game(private val condition: GameCondition) {
     private val players: Map<Color, Player> = mapOf(
-        Color.BLACK to createPlayer(condition.playerBlack, Color.BLACK, condition.millisInGame, condition.millisInTurn),
-        Color.WHITE to createPlayer(condition.playerWhite, Color.WHITE, condition.millisInGame, condition.millisInTurn)
+            Color.BLACK to createPlayer(condition.playerBlack, Color.BLACK, condition.millisInGame, condition.millisInTurn),
+            Color.WHITE to createPlayer(condition.playerWhite, Color.WHITE, condition.millisInGame, condition.millisInTurn)
     )
 
     private val remainingMillisInGame: MutableMap<Color, Long> = mutableMapOf(
-        Color.BLACK to condition.millisInGame,
-        Color.WHITE to condition.millisInGame
+            Color.BLACK to condition.millisInGame,
+            Color.WHITE to condition.millisInGame
     )
 
     private val board: MutableBoard = mutableBoardOf()
@@ -113,7 +113,7 @@ class Game(private val condition: GameCondition) {
             try {
                 // お勉強MEMO: この「!!」はみっともないのでどうにかしたい。javaでいうEnumMapみたいのは無いか？
                 chosen = players[currTurn]!!
-                    .choosePoint(board.toBoard(), remainingMillisInGame[currTurn]!!)
+                        .choosePoint(board.toBoard(), remainingMillisInGame[currTurn]!!)
 
             } catch (e: Exception) {
                 println("$currTurn の思考中に例外が発生しました。$currTurn の負けです。")

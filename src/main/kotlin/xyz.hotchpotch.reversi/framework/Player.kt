@@ -11,9 +11,9 @@ import kotlin.reflect.full.companionObjectInstance
 
 // とりあえず版。ここにあるのは本当はイマイチ。
 fun players(): List<KClass<out Player>> = listOf(
-    SimplestPlayer::class,
-    RandomPlayer::class,
-    MonteCarloPlayer::class
+        SimplestPlayer::class,
+        RandomPlayer::class,
+        MonteCarloPlayer::class
 )
 
 /**
@@ -67,14 +67,14 @@ interface PlayerFactory {
  * @throws IllegalArgumentException 指定された [Player] 実装クラスのコンパニオンオブジェクトが [PlayerFactory] を実装しない場合
  */
 fun createPlayer(
-    playerClass: KClass<out Player>,
-    color: Color,
-    millisInGame: Long,
-    millisInTurn: Long
+        playerClass: KClass<out Player>,
+        color: Color,
+        millisInGame: Long,
+        millisInTurn: Long
 ): Player {
 
     val factory: Any? = playerClass.companionObjectInstance
     return if (factory is PlayerFactory) factory.create(color, millisInGame, millisInTurn)
     else throw IllegalArgumentException(
-        "Player実装クラスはPlayerFactoryインタフェースを実装したコンパニオンオブジェクトを持つ必要があります。")
+            "Player実装クラスはPlayerFactoryインタフェースを実装したコンパニオンオブジェクトを持つ必要があります。")
 }

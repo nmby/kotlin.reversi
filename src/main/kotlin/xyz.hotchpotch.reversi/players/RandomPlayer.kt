@@ -10,7 +10,7 @@ import xyz.hotchpotch.reversi.framework.PlayerFactory
 class RandomPlayer(private val color: Color) : Player {
     companion object : PlayerFactory {
         override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
-            RandomPlayer(color)
+                RandomPlayer(color)
     }
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {

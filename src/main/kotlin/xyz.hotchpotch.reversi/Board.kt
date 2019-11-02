@@ -68,14 +68,14 @@ fun mutableBoardOf(original: Board): MutableBoard = MutableBoardImpl(original)
 internal fun boardOf(map: Map<Point, Color>): Board = BoardImpl(map)
 
 private fun Board.toMap(): Map<Point, Color> =
-    // MEMO: スマートキャストいまいち。警告がうるさいな・・・
-    Point.values().filter { this[it] !== null }.associateWith { this[it] } as Map<Point, Color>
+        // MEMO: スマートキャストいまいち。警告がうるさいな・・・
+        Point.values().filter { this[it] !== null }.associateWith { this[it] } as Map<Point, Color>
 
 private val initMap: Map<Point, Color> = mapOf(
-    Point[(Point.HEIGHT - 1) / 2, (Point.WIDTH - 1) / 2] to Color.WHITE,
-    Point[Point.HEIGHT / 2, Point.WIDTH / 2] to Color.WHITE,
-    Point[(Point.HEIGHT - 1) / 2, Point.WIDTH / 2] to Color.BLACK,
-    Point[Point.HEIGHT / 2, (Point.WIDTH - 1) / 2] to Color.BLACK
+        Point[(Point.HEIGHT - 1) / 2, (Point.WIDTH - 1) / 2] to Color.WHITE,
+        Point[Point.HEIGHT / 2, Point.WIDTH / 2] to Color.WHITE,
+        Point[(Point.HEIGHT - 1) / 2, Point.WIDTH / 2] to Color.BLACK,
+        Point[Point.HEIGHT / 2, (Point.WIDTH - 1) / 2] to Color.BLACK
 )
 
 private open class BoardImpl : Board {

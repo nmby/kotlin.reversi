@@ -18,7 +18,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
 
     companion object : PlayerFactory {
         override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
-            MonteCarloPlayer(color, millisInTurn)
+                MonteCarloPlayer(color, millisInTurn)
     }
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
@@ -64,11 +64,11 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
 
         // ここで並列化するのが一番良いんじゃないかなー・・・　というのは根拠のない想定
         return Stream.generate { (currBoard + Move(color, candidate)).toMutableBoard() }
-            .parallel()
-            .limit(times.toLong())
-            .map { tryOut(it) }
-            .filter { it === color }
-            .count()
+                .parallel()
+                .limit(times.toLong())
+                .map { tryOut(it) }
+                .filter { it === color }
+                .count()
     }
 
     /**

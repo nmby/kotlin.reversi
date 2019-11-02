@@ -1,7 +1,10 @@
 package xyz.hotchpotch.reversi
 
+// お勉強MEMO:
+// こういう Java で言う　private static なメソッドを
+// トップレベルに置くのはいかがなのかしら・・・？
 private fun isValidIdx(i: Int, j: Int): Boolean =
-    i in 0 until Point.HEIGHT && j in 0 until Point.WIDTH
+        i in 0 until Point.HEIGHT && j in 0 until Point.WIDTH
 
 private fun idxToOrdinal(i: Int, j: Int): Int = i * Point.WIDTH + j
 
@@ -30,8 +33,8 @@ class Point private constructor(ordinal: Int) {
         const val WIDTH = 8
 
         private val values: List<Point> = (0 until HEIGHT * WIDTH)
-            .map { Point(it) }
-            .toList()
+                .map { Point(it) }
+                .toList()
 
         // 冗長ではあるが、アクセス効率を優先させる。
         private val map: Map<String, Point> = values.associateBy(Point::pos)
