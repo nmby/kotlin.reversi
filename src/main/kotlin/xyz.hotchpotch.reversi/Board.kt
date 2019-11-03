@@ -91,7 +91,6 @@ private open class BoardImpl : Board {
     protected val map: MutableMap<Point, Color>
 
     constructor() {
-        // Accessing non-final property 警告がうるさいな・・・　どうするのが良いんだろう
         map = initMap.toMutableMap()
     }
 

@@ -6,6 +6,24 @@ import kotlin.reflect.KClass
 private const val DEFAULT_PROMPT: String = "> "
 private const val DEFAULT_CAUTION: String = "入力形式が不正です。再入力してください。"
 
+/**
+ * 標準入出力から対話的にユーザー入力値を取得するためのスキャナーです。
+ * [ConsoleScanner] は求める形式の入力が得られるまでユーザーに何度も再入力を求め、
+ * クライアントが必要とする型に変換したうえで返します。
+ *
+ * 例） 1～10の範囲の整数値を取得したい場合
+ * クライアント側で次のように記述することで、目的の整数値を取得できます。
+ * ```kotlin
+ *     val input: Int = ConsoleScanner.forInt(1, 10).get()
+ * ```
+ *
+ * 例）リストの中から１つの要素を選ばせたい場合
+ * ```kotlin
+ *     val chosen: T = ConsoleScanner.forList(list).get()
+ * ```
+ *
+ * 上記は一例です。その他の機能については各メンバの説明を参照してください。
+ */
 class ConsoleScanner<out T>(
         private val judge: (String) -> Boolean,
         private val converter: (String) -> T,
