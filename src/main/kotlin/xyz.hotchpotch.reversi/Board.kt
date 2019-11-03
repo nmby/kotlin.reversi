@@ -33,7 +33,7 @@ interface Board {
     /**
      * @return このリバーシ盤上の指定された色の石の数を返します。
      */
-    fun count(color: Color): Int = toMap().values.count { it === color }
+    fun count(color: Color): Int = Point.values().count { this[it] === color }
 }
 
 /**
@@ -86,12 +86,11 @@ private open class BoardImpl : Board {
 
     // お勉強MEMO:
     // このプロパティを open にせず、かつ BoardImpl と共用できるよう、
-    // BoardImpl.map は Map　として MutableBoardImpl.map は MutableMap にオーバーライドするのではなく、
+    // BoardImpl.map は Map として MutableBoardImpl.map は MutableMap にオーバーライドするのではなく、
     // 最初から MutableMap にしてしまうことにした。
     protected val map: MutableMap<Point, Color>
 
     constructor() {
-        // Accessing non-final property 警告がうるさいな・・・　どうするのが良いんだろう
         map = initMap.toMutableMap()
     }
 

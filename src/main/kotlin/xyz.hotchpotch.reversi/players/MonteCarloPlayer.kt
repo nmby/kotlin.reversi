@@ -31,7 +31,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         val totalWins: MutableMap<Point, Long> = mutableMapOf()
         val deadline: Instant = deadline(now, board, millisInGame)
         while (Instant.now() < deadline) {
-            val wins: Map<Point, Long> = availables.associateWith { tryOut(board, it) }
+            val wins: Map<Point, Long> = availables.associateWith { playOutN(board, it) }
             availables.forEach { totalWins[it] = (totalWins[it] ?: 0) + (wins[it] ?: 0) }
         }
 
@@ -59,32 +59,31 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
      * @return 自身の色が勝利した回数
      */
     // 本当は勝利回数だけじゃなくて引き分けの回数も考慮すると精度が上がるが、今回はまぁ良しとする。
-    private fun tryOut(currBoard: Board, candidate: Point, times: Int = TIMES): Long {
+    private fun playOutN(currBoard: Board, candidate: Point, times: Int = TIMES): Long {
         assert(currBoard.canPutAt(color, candidate))
 
         // ここで並列化するのが一番良いんじゃないかなー・・・　というのは根拠のない想定
         return Stream.generate { (currBoard + Move(color, candidate)).toMutableBoard() }
                 .parallel()
                 .limit(times.toLong())
-                .map { tryOut(it) }
+                .map { playOut1(it, color.reversed()) }
                 .filter { it === color }
                 .count()
     }
 
     /**
-     * 指定されたリバーシ版に、相手のターンからゲーム終了までランダムに手を進めて行き、勝者の色を返します。
+     * 指定されたリバーシ盤をランダムな手で更新し、末尾再帰的にゲーム終了まで進め、勝者の色を返します。
      *
-     * @param board 今回の自分の手番を打ち終わった状態のリバーシ盤
-     * @return ランダムな施行の結果の勝者の色
+     * @param board リバーシ盤
+     * @param currTurn 現在の手番の色
+     * @return 勝者の色。引き分けの場合は null
      */
-    private fun tryOut(board: MutableBoard): Color? {
-        var color = color.reversed()
+    // お勉強MEMO: せっかくなので末尾再帰（tailrec）ってやつを使ってみる。
+    private tailrec fun playOut1(board: MutableBoard, currTurn: Color): Color? {
+        if (!board.isGameOngoing()) return board.winner()
 
-        while (board.isGameOngoing()) {
-            val availables = Point.values().filter { board.canPutAt(color, it) }
-            if (availables.isNotEmpty()) board.apply(Move(color, availables.random()))
-            color = color.reversed()
-        }
-        return board.winner()
+        val availables = Point.values().filter { board.canPutAt(currTurn, it) }
+        if (availables.isNotEmpty()) board.apply(Move(currTurn, availables.random()))
+        return playOut1(board, currTurn.reversed())
     }
 }
