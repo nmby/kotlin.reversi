@@ -139,7 +139,7 @@ class Game(private val condition: GameCondition) {
 
                 if (condition.millisInTurn < passedMillis) {
                     println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を" +
-                            "${passedMillis}ミリ秒超過しました。 $currTurn の負けです。")
+                            "${passedMillis - condition.millisInTurn}ミリ秒超過しました。 $currTurn の負けです。")
                     return currTurn.reversed()
                 }
 
