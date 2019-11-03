@@ -3,6 +3,7 @@ package xyz.hotchpotch.reversi.framework
 import xyz.hotchpotch.reversi.Board
 import xyz.hotchpotch.reversi.Color
 import xyz.hotchpotch.reversi.Point
+import xyz.hotchpotch.reversi.players.ManualPlayer
 import xyz.hotchpotch.reversi.players.MonteCarloPlayer
 import xyz.hotchpotch.reversi.players.RandomPlayer
 import xyz.hotchpotch.reversi.players.SimplestPlayer
@@ -11,6 +12,7 @@ import kotlin.reflect.full.companionObjectInstance
 
 // とりあえず版。ここにあるのは本当はイマイチ。
 fun players(): List<KClass<out Player>> = listOf(
+        ManualPlayer::class,
         SimplestPlayer::class,
         RandomPlayer::class,
         MonteCarloPlayer::class

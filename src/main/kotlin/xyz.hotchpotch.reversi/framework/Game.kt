@@ -7,8 +7,6 @@ import java.time.Instant
 import kotlin.reflect.KClass
 
 // このファイルはやっつけです。
-// TODO: そのうちちゃんと作る
-// @see https://github.com/nmby/reversi
 
 fun main() {
     val isRepeat: ConsoleScanner<Boolean> = ConsoleScanner(
@@ -118,13 +116,12 @@ class Game(private val condition: GameCondition) {
             println(board)
             print("$currTurn の番です...  ")
 
-            val before: Instant = Instant.now()
-
             // あんまり広すぎる with は良くない。が、今回は実験ということで・・・
             // with の中身をコンパイル時ではなく実行時に指定できるのは便利そう。
             with(if (currTurn === Color.BLACK) blackItem else whiteItem) {
 
                 val chosen: Point?
+                val before: Instant = Instant.now()
                 try {
                     chosen = player.choosePoint(board.toBoard(), remainingMillis)
                 } catch (e: Exception) {
@@ -139,7 +136,7 @@ class Game(private val condition: GameCondition) {
 
                 if (condition.millisInTurn < passedMillis) {
                     println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を" +
-                            "${passedMillis}ミリ秒超過しました。 $currTurn の負けです。")
+                            "${passedMillis - condition.millisInTurn}ミリ秒超過しました。 $currTurn の負けです。")
                     return currTurn.reversed()
                 }
 
@@ -155,7 +152,6 @@ class Game(private val condition: GameCondition) {
                     println("ルール違反の手が指定されました。 $currTurn の負けです。")
                     return currTurn.reversed()
                 }
-
                 board.apply(move)
             }
             currTurn = currTurn.reversed()
@@ -167,7 +163,8 @@ class Game(private val condition: GameCondition) {
         val winner = board.winner()
         if (winner === null) println("引き分けです。")
         else println(" $winner の勝ちです。 " +
-                "${Color.BLACK}:${board.count(Color.BLACK)}, ${Color.WHITE}:${board.count(Color.WHITE)}")
+                "${Color.BLACK}:${board.count(Color.BLACK)}（残り${blackItem.remainingMillis}ミリ秒）, " +
+                "${Color.WHITE}:${board.count(Color.WHITE)}（残り${whiteItem.remainingMillis}ミリ秒）")
         return winner
     }
 }

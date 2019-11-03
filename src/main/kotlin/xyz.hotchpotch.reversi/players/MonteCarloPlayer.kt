@@ -50,12 +50,12 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     }
 
     /**
-     * 現在のターンで自分が選択できる手の一つについて、トライアウトを規定回数実施し、
+     * 現在のターンで自分が選択できる手の一つについて、プレイアウトを規定回数実施し、
      * 自身の色が勝利した回数を返します。
      *
      * @param currBoard 現在のリバーシ盤
      * @param candidate 現在のターンで選択できる位置のうちの一つ
-     * @param times トライアウトを行う回数
+     * @param times プレイアウトを行う回数
      * @return 自身の色が勝利した回数
      */
     // 本当は勝利回数だけじゃなくて引き分けの回数も考慮すると精度が上がるが、今回はまぁ良しとする。
@@ -63,7 +63,8 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         assert(currBoard.canPutAt(color, candidate))
 
         // ここで並列化するのが一番良いんじゃないかなー・・・　というのは根拠のない想定
-        return Stream.generate { (currBoard + Move(color, candidate)).toMutableBoard() }
+        val nextBoard: Board = currBoard + Move(color, candidate)
+        return Stream.generate { nextBoard.toMutableBoard() }
                 .parallel()
                 .limit(times.toLong())
                 .map { playOut1(it, color.reversed()) }
