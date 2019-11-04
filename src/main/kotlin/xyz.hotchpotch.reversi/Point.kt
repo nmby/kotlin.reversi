@@ -17,13 +17,14 @@ class Point private constructor(ordinal: Int) {
     // MEMO:
     // 本当は、いちいち Point.values.forEach { ～ }　などと書くのはダサいので、
     // Point.forEach { ～ } などと書けるように、
-    //     companion object: Iterable<Point> by values {
+    //     companion object: Iterable<Point> by Point.values {
     //         private val values: List<Point> = (0 until HEIGHT * WIDTH).map { Point[it] }.toList()
     //     }
     // としたかった。
     // しかし、コンパイルは正常に通るものの、Point.forEach { ～ } などを実行すると
     // 実行時に NullPointerException が発生してしまう。
-    // 初期化の順番？タイミング？の問題だと推測するが、詳細な原理は要お勉強。
+    // 初期化のタイミングの問題だと理解。
+    // やっぱ、外側の初期化済みオブジェクトじゃないとダメなのね...
     companion object {
 
         /** 座標平面（つまりリバーシ盤）の高さ */
@@ -42,9 +43,14 @@ class Point private constructor(ordinal: Int) {
         /**
          * @return 全ての [Point] インスタンスが格納されたリストを返します。
          */
-        // MEMO: values プロパティをそのまま public にしてしまっても良いのだが、
-        // Enum.values() とスタイルを合わせることにした。
-        fun values(): List<Point> = values
+        // お勉強MEMO:
+        // Point.values が　List　という読み取り専用の型であることにつられて、
+        // ついそれが不変オブジェクトであると思ってしまっていた。。。
+        // Point.values のインスタンス（Point.values の初期化時に Iterable.toList が返すオブジェクト）は、
+        // 現在の実装ではどうやら MutableList のようなので、
+        // ここで Point.values を直接暴露してしまうと、外部から変更される恐れがあった。
+        // ということで、コピーを返す実装に修正。
+        fun values(): List<Point> = values.toList()
 
         /**
          * @return [i, j] 形式で指定された位置の Point インスタンスを返します。
