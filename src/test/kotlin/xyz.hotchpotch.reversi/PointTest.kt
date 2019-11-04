@@ -9,20 +9,33 @@ internal class PointTest {
 
     @Test
     fun testInstance() {
-        // Point[0, 0] と Point["a1"] で同一インスタンスが取得できること
         (0 until Point.HEIGHT).forEach { i ->
             (0 until Point.WIDTH).forEach { j ->
                 val point: Point = Point[i, j]
-                assertSame(point, Point[point.pos])
+
+                // Point[i, j] と Point[pos] で同一インスタンスが取得できること
+                val pos = "${'a' + j}${1 + i}"
+                assertSame(point, Point[pos])
+
+                // 一応、i, j プロパティのテスト
+                assertEquals(i, point.i)
+                assertEquals(j, point.j)
             }
         }
 
+        // 逆パターンも一応テスト
         ('a' until 'a' + Point.WIDTH).forEach { c ->
             ('1' until Point.HEIGHT.toChar()).forEach { n ->
-                val point: Point = Point["$c$n"]
+                val pos = "$c$n"
+                val point: Point = Point[pos]
+
+                // Point[pos] と Point[i, j] で同一インスタンスが取得できること
                 val i: Int = n - '1'
                 val j: Int = c - 'a'
                 assertSame(point, Point[i, j])
+
+                // 一応、pos プロパティのテスト
+                assertEquals(pos, point.pos)
             }
         }
     }
