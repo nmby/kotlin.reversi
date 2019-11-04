@@ -44,11 +44,9 @@ class Point private constructor(ordinal: Int) {
          * @return 全ての [Point] インスタンスが格納されたリストを返します。
          */
         // お勉強MEMO:
-        // Point.values が　List　という読み取り専用の型であることにつられて、
-        // ついそれが不変オブジェクトであると思ってしまっていた。。。
-        // Point.values のインスタンス（Point.values の初期化時に Iterable.toList が返すオブジェクト）は、
-        // 現在の実装ではどうやら MutableList のようなので、
-        // ここで Point.values を直接暴露してしまうと、外部から変更される恐れがあった。
+        // Point.values を初期化する際の Iterable.toList(): List<T> は
+        // 可変オブジェクトを返す実装になってるっぽい。
+        // Kotlinではオブジェクトの不変性ってあんま意識しないものなのかな・・・？？？？？
         // ということで、コピーを返す実装に修正。
         fun values(): List<Point> = values.toList()
 
