@@ -1,155 +1,136 @@
 package xyz.hotchpotch.reversi.framework
 
 import xyz.hotchpotch.reversi.*
-import xyz.hotchpotch.reversi.util.ConsoleScanner
 import java.time.Duration
 import java.time.Instant
 import kotlin.reflect.KClass
 
-// このファイルはやっつけです。
+/**
+ * 2プレーヤーで1回対戦を行う「ゲーム」です。
+ *
+ * @param playerBlack 黒プレーヤーのクラス
+ * @param playerWhite 白プレーヤーのクラス
+ * @param millisInGame ゲーム内の各プレーヤーの持ち時間（ミリ秒）
+ * @param millisInTurn 一手当たりの制限時間（ミリ秒）
+ * @param automatic 一手ごとに対話的に手を進める「対話モード」ではなく
+ *                  自動でゲーム完了まで進める「自動モード」の場合は true
+ * @param silent 標準出力への出力なしで進行させる場合は true
+ *               一手ごとの状態をインタラクティブに出力しながら進行する場合は false
+ */
+class Game(
+        private val playerBlack: KClass<out Player>,
+        private val playerWhite: KClass<out Player>,
+        private val millisInGame: Long,
+        private val millisInTurn: Long,
+        private val automatic: Boolean = false,
+        private val silent: Boolean = false
+) : Playable<Color?> {
 
-fun main() {
-    val isRepeat: ConsoleScanner<Boolean> = ConsoleScanner(
-            judge = { true },
-            converter = { it == "y" },
-            prompt = "もう一度行いますか？ (y/N) > "
-    )
-
-    do {
-        val condition = GameCondition.arrangeViaConsole()
-        Game(condition).play()
-    } while (isRepeat.get())
-}
-
-data class GameCondition(
-        val playerBlack: KClass<out Player>,
-        val playerWhite: KClass<out Player>,
-        val millisInGame: Long,
-        val millisInTurn: Long,
-        val automatic: Boolean = true
-) {
-
-    companion object {
-        fun arrangeViaConsole(): GameCondition {
-
-            val playersList: String = players()
-                    .mapIndexed { idx, playerClass -> "\t${idx + 1} : ${playerClass.qualifiedName}" }
-                    .joinToString("\n")
-
-            val playerBlack: KClass<out Player> = ConsoleScanner.forList(
-                    list = players(),
-                    prompt = "${playersList}\n${Color.BLACK} のプレーヤーを番号で選択してください > "
-            ).get()
-
-            val playerWhite: KClass<out Player> = ConsoleScanner.forList(
-                    list = players(),
-                    prompt = "${playersList}\n${Color.WHITE} のプレーヤーを番号で選択してください > "
-            ).get()
-
-            val minInGame: Long = 100
-            val maxInGame: Long = 1000 * 60 * 60
-            val millisInGame: Long = ConsoleScanner.forLong(
-                    startInclusive = minInGame,
-                    endInclusive = maxInGame,
-                    prompt = "ゲーム内の持ち時間（ミリ秒）を ${minInGame}～${maxInGame} の範囲で指定してください > "
-            ).get()
-
-            val minInTurn: Long = 50
-            val maxInTurn: Long = 1000 * 60 * 10
-            val millisInTurn: Long = ConsoleScanner.forLong(
-                    startInclusive = minInTurn,
-                    endInclusive = maxInTurn,
-                    prompt = "一手ごとの制限時間（ミリ秒）を ${minInTurn}～${maxInTurn} の範囲で指定してください > "
-            ).get()
-
-            val automatic: Boolean = ConsoleScanner(
-                    judge = { it.toLowerCase() == "y" || it.toLowerCase() == "n" },
-                    converter = { it == "y" },
-                    prompt = "自動モードで実行しますか？ (y/N) > "
-            ).get()
-
-            return GameCondition(playerBlack, playerWhite, millisInGame, millisInTurn, automatic)
-        }
+    companion object : PlayableFactory<Game> {
+        override val description: String = "2プレーヤーで1回対戦します。"
+        override fun arrangeViaConsole(): Game = Game(
+                Scanners.player("${Color.BLACK} のプレーヤー").get(),
+                Scanners.player("${Color.WHITE} のプレーヤー").get(),
+                Scanners.millisInGame.get(),
+                Scanners.millisInTurn.get()
+        )
     }
 
-    override fun toString(): String = ("" +
-            "${Color.BLACK} : ${playerBlack.qualifiedName}\n" +
-            "${Color.WHITE} : ${playerWhite.qualifiedName}\n" +
-            "ゲーム内の総持ち時間（ミリ秒） : $millisInGame\n" +
-            "一手当たりの制限時間（ミリ秒） : $millisInTurn")
-}
+    /** 黒・白プレーヤーごとのプロパティを表します。 */
+    private interface Props {
 
-class Game(private val condition: GameCondition) {
-
-    // うーむ。ちょっとトリッキー過ぎるかな。。。
-    // まぁ、こんなことも出来るんですねという実験として、今回はこれで行ってみる。
-    private interface Item {
+        /** [Player] インスタンス */
         val player: Player
-        var remainingMillis: Long
+
+        /** ゲーム内での残り持ち時間（ミリ秒） */
+        var remainedMillis: Long
     }
 
-    private val blackItem = object : Item {
-        override val player: Player =
-                // with の使いどころも考える必要がありそう。今回は実験として使ってみる。
-                with(condition) { createPlayer(playerBlack, Color.BLACK, millisInGame, millisInTurn) }
-        override var remainingMillis: Long = condition.millisInGame
+    /** 黒プレーヤーのプロパティ */
+    private val blackProps = object : Props {
+        override val player =
+                createPlayer(playerBlack, Color.BLACK, millisInGame, millisInTurn)
+        override var remainedMillis = millisInGame
     }
 
-    private val whiteItem = object : Item {
-        override val player: Player =
-                with(condition) { createPlayer(playerWhite, Color.WHITE, millisInGame, millisInTurn) }
-        override var remainingMillis: Long = condition.millisInGame
+    /** 白プレーヤーのプロパティ */
+    private val whiteProps = object : Props {
+        override val player =
+                createPlayer(playerWhite, Color.WHITE, millisInGame, millisInTurn)
+        override var remainedMillis = millisInGame
     }
 
     private val board: MutableBoard = mutableBoardOf()
     private var currTurn: Color = Color.BLACK
 
-    fun play(): Color? {
+    /**
+     * ゲーム終了時点のリバーシ盤を返します。
+     * @throws IllegalStateException ゲームが終了していない場合
+     */
+    val resultBoard: Board
+        get() =
+            if (board.isGameOngoing()) throw IllegalStateException("まだゲーム中です。")
+            else board.toBoard()
+
+    override fun play(): Color? {
         check(board.isGameOngoing())
         { "Gameクラスはいわゆるワンショットです。ゲームごとに新たなインスタンスを利用してください。" }
 
-        println("ゲームを開始します。")
-        println(condition)
+        if (!silent) {
+            println("\nゲームを開始します。")
+            println("\t${Color.BLACK} : ${playerBlack.qualifiedName}\n" +
+                    "\t${Color.WHITE} : ${playerWhite.qualifiedName}\n" +
+                    "\tゲーム内の総持ち時間（ミリ秒） : $millisInGame\n" +
+                    "\t一手当たりの制限時間（ミリ秒） : $millisInTurn\n" +
+                    "> ")
+            if (automatic) println() else readLine()
+        }
 
         while (board.isGameOngoing()) {
-            println()
-            println(board)
-            print("$currTurn の番です...  ")
+            if (!silent) {
+                println(board)
+                print("$currTurn の番です...  ")
+            }
 
             // あんまり広すぎる with は良くない。が、今回は実験ということで・・・
             // with の中身をコンパイル時ではなく実行時に指定できるのは便利そう。
-            with(if (currTurn === Color.BLACK) blackItem else whiteItem) {
+            with(if (currTurn === Color.BLACK) blackProps else whiteProps) {
 
                 val chosen: Point?
                 val before: Instant = Instant.now()
                 try {
-                    chosen = player.choosePoint(board.toBoard(), remainingMillis)
+                    chosen = player.choosePoint(board.toBoard(), remainedMillis)
                 } catch (e: Exception) {
-                    println("$currTurn の思考中に例外が発生しました。 $currTurn の負けです。")
-                    e.printStackTrace()
+                    if (!silent) {
+                        println("$currTurn の思考中に例外が発生しました。 $currTurn の負けです。")
+                        e.printStackTrace()
+                    }
                     return currTurn.reversed()
                 }
                 val passedMillis: Long = Duration.between(before, Instant.now()).toMillis()
 
-                print("${chosen ?: "PASS"} が選択されました。（経過時間 : ${passedMillis}ミリ秒）")
-                if (condition.automatic) println() else readLine()
+                if (!silent) {
+                    print("${chosen ?: "PASS"} が選択されました。（経過時間 : ${passedMillis}ミリ秒） > ")
+                    if (automatic) println() else readLine()
+                    println()
+                }
 
-                if (condition.millisInTurn < passedMillis) {
-                    println("一手当たりの持ち時間（${condition.millisInTurn}ミリ秒）を" +
-                            "${passedMillis - condition.millisInTurn}ミリ秒超過しました。 $currTurn の負けです。")
+                if (millisInTurn < passedMillis) {
+                    if (!silent) println("一手当たりの持ち時間（${millisInTurn}ミリ秒）を" +
+                            "${passedMillis - millisInTurn}ミリ秒超過しました。 $currTurn の負けです。")
                     return currTurn.reversed()
                 }
 
-                if (remainingMillis < passedMillis) {
-                    println("ゲーム内の持ち時間（${condition.millisInGame}ミリ秒）を" +
-                            "${passedMillis - remainingMillis}ミリ秒超過しました。 $currTurn の負けです。")
+                if (remainedMillis < passedMillis) {
+                    if (!silent) println("ゲーム内の持ち時間（${millisInGame}ミリ秒）を" +
+                            "${passedMillis - remainedMillis}ミリ秒超過しました。 $currTurn の負けです。")
                     return currTurn.reversed()
                 }
-                remainingMillis -= passedMillis
+                remainedMillis -= passedMillis
 
                 val move = Move(currTurn, chosen)
                 if (!board.canApply(move)) {
-                    println("ルール違反の手が指定されました。 $currTurn の負けです。")
+                    if (!silent) println("ルール違反の手が指定されました。 $currTurn の負けです。")
                     return currTurn.reversed()
                 }
                 board.apply(move)
@@ -157,14 +138,15 @@ class Game(private val condition: GameCondition) {
             currTurn = currTurn.reversed()
         }
 
-        println()
-        println(board)
-        print("ゲームが終了しました。")
         val winner = board.winner()
-        if (winner === null) println("引き分けです。")
-        else println(" $winner の勝ちです。 " +
-                "${Color.BLACK}:${board.count(Color.BLACK)}（残り${blackItem.remainingMillis}ミリ秒）, " +
-                "${Color.WHITE}:${board.count(Color.WHITE)}（残り${whiteItem.remainingMillis}ミリ秒）")
+        if (!silent) {
+            println(board)
+            print("ゲームが終了しました。")
+            if (winner === null) println("引き分けです。")
+            else println(" $winner の勝ちです。 " +
+                    "${Color.BLACK}:${board.count(Color.BLACK)}（残り${blackProps.remainedMillis}ミリ秒）, " +
+                    "${Color.WHITE}:${board.count(Color.WHITE)}（残り${whiteProps.remainedMillis}ミリ秒）")
+        }
         return winner
     }
 }
