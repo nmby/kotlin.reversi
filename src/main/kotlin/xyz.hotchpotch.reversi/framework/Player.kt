@@ -10,14 +10,6 @@ import xyz.hotchpotch.reversi.players.SimplestPlayer
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
 
-// とりあえず版。ここにあるのは本当はイマイチ。
-fun players(): List<KClass<out Player>> = listOf(
-        ManualPlayer::class,
-        SimplestPlayer::class,
-        RandomPlayer::class,
-        MonteCarloPlayer::class
-)
-
 /**
  * リバーシのプレーヤーを表します。
  *
@@ -25,6 +17,24 @@ fun players(): List<KClass<out Player>> = listOf(
  * 詳細は [PlayerFactory.create] の説明を参照してください。
  */
 interface Player {
+
+    companion object {
+
+        /** 既知の [Player] 実装クラスの一覧 */
+        // 本当はリフレクションか何かで実現したいところ
+        val implementations: List<KClass<out Player>>
+            // お勉強MEMO:
+            // こういうの、思わずカスタムゲッターではなくそのまま初期値として代入してしまいそうになる。
+            // 気を付ける必要あり。
+            // というか、Kotlin の流儀では可変オブジェクトをそのまま返しちゃってもよいのか？
+            // いや、オブジェクト指向である以上、それはないはず
+            get() = listOf(
+                    ManualPlayer::class,
+                    SimplestPlayer::class,
+                    RandomPlayer::class,
+                    MonteCarloPlayer::class
+            )
+    }
 
     /**
      * @param board 現在のリバーシ盤

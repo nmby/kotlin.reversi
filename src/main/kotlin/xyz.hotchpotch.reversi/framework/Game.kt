@@ -63,14 +63,9 @@ class Game(
     private val board: MutableBoard = mutableBoardOf()
     private var currTurn: Color = Color.BLACK
 
-    /**
-     * ゲーム終了時点のリバーシ盤を返します。
-     * @throws IllegalStateException ゲームが終了していない場合
-     */
     val resultBoard: Board
-        get() =
-            if (board.isGameOngoing()) throw IllegalStateException("まだゲーム中です。")
-            else board.toBoard()
+        // TODO: ステータスチェックする！
+        get() = board.toBoard()
 
     override fun play(): Color? {
         check(board.isGameOngoing())

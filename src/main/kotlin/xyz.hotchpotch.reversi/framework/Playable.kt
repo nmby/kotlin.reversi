@@ -8,9 +8,7 @@ import kotlin.reflect.full.companionObjectInstance
 // 一つのファイルに複数の要素を詰め込むの、どう考えればよいんだろう。
 // 今回は実験として色々モリモリにしてみた。
 fun main() {
-    val playables: List<KClass<out Playable<*>>> = listOf(Game::class, Match::class)
-
-    val menuList: String = playables
+    val menuList: String = Playable.types
             .mapIndexed { idx, clazz ->
                 "\t${idx + 1} : ${clazz.simpleName}" +
                         " - ${(clazz.companionObjectInstance as PlayableFactory<*>).description}"
@@ -18,7 +16,7 @@ fun main() {
             .joinToString("\n")
 
     val selectMenu: ConsoleScanner<KClass<out Playable<*>>> = ConsoleScanner.forList(
-            list = playables,
+            list = Playable.types,
             prompt = "${menuList}\n番号で選択してください > "
     )
 
@@ -40,6 +38,18 @@ fun main() {
  * @param T 結果の型
  */
 interface Playable<out T> {
+
+    companion object {
+
+        /** 既知の [Playable] 実装クラスの一覧 */
+        // Playable 実装クラスの一覧を取得しやすくするために
+        // Playable をインタフェースではなく sealed クラスにするとよいのかも？？
+        // と思って一度してみたものの、
+        // 全実装クラスをここに記述しなくてはならず不細工になる割には旨味が少ないので、やめた。
+        val types: List<KClass<out Playable<*>>>
+            // 本当はリフレクションで実現できると良いのだろうけど、今回はこれで良しとする。
+            get() = listOf(Game::class, Match::class, League::class)
+    }
 
     /** この [Playable] を実行して結果を返します。 */
     fun play(): T
@@ -64,7 +74,7 @@ interface PlayableFactory<out T : Playable<Any?>> {
 /** [Playable] 実装クラスの実行条件を標準入力から取得するためのスキャナーを集めたものです。 */
 object Scanners {
 
-    private val playersList: String = players()
+    private val playersList: String = Player.implementations
             .mapIndexed { idx, playerClass -> "\t${idx + 1} : ${playerClass.qualifiedName}" }
             .joinToString("\n")
 
@@ -74,7 +84,7 @@ object Scanners {
      * @param playerDesc 標準出力に表示するプレーヤーの呼称（"●プレーヤー" や "プレーヤーA" など）
      */
     fun player(playerDesc: String): ConsoleScanner<KClass<out Player>> = ConsoleScanner.forList(
-            list = players(),
+            list = Player.implementations,
             prompt = "${playersList}\n${playerDesc}を番号で選択してください > "
     )
 
