@@ -46,10 +46,10 @@ class Match(
 
     override fun play(): Map<KClass<out Player>, Record> {
         check(recordA.totalPlays == 0)
-        { "Matchクラスはいわゆるワンショットです。マッチごとに新たなインスタンスを利用してください。" }
+        { "Matchクラスはいわゆるワンショットです。対戦ごとに新たなインスタンスを利用してください。" }
 
         if (!silent) {
-            println("\nマッチを開始します。")
+            println("\n対戦を開始します。")
             println("\tプレーヤーA : ${playerA.qualifiedName}\n" +
                     "\tプレーヤーB : ${playerB.qualifiedName}\n" +
                     "\tゲーム内の総持ち時間（ミリ秒） : $millisInGame\n" +
@@ -94,7 +94,7 @@ class Match(
 
         if (!silent) {
             println("\n総合成績：")
-            println("\tA：${recordA.wins}, B：${recordA.losses}, 引き分け：${recordA.draws}")
+            println("\tAの勝ち：${recordA.wins}, 引き分け：${recordA.draws}, Bの勝ち：${recordA.losses}")
             println(when {
                 recordA.losses < recordA.wins -> "\tAの勝ちです。"
                 recordA.wins < recordA.losses -> "\tBの勝ちです。"
