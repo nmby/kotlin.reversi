@@ -1,7 +1,7 @@
 package xyz.hotchpotch.reversi.framework
 
 /**
- * あるプレーヤーの対戦回数（勝ち、負け、引き分け）を保持する可変クラスです。
+ * あるプレーヤーの対戦成績（勝ち、負け、引き分け）を保持する可変クラスです。
  */
 // 本当は可変クラスは嫌いなのだが、まぁこれくらいなら良いかな？と思い可変にしちゃった。
 // 可変クラスの何が嫌いかって、使うときに気をつけなきゃならない。
@@ -26,6 +26,13 @@ data class Record(var wins: Int = 0, var losses: Int = 0, var draws: Int = 0) : 
 
     /** 相手の対戦成績（つまりこの対戦成績の勝ち数と負け数を入れ替えたもの）を生成して返します。 */
     fun reversed(): Record = Record(wins = losses, losses = wins, draws = draws)
+
+    /** この対戦成績に指定された対戦成績を加算します。 */
+    fun add(other: Record) {
+        wins += other.wins
+        losses += other.losses
+        draws += other.draws
+    }
 
     operator fun plus(other: Record): Record =
             Record(wins + other.wins, losses + other.losses, draws + other.draws)
