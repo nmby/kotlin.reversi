@@ -1,30 +1,26 @@
 package xyz.hotchpotch.reversi
 
+/** (i, j) 形式の座標が範囲内かを返します。 */
 // お勉強MEMO:
 // こういう Java で言う　private static なメソッドを
 // トップレベルに置くのはいかがなのかしら・・・？
 private fun isValidIdx(i: Int, j: Int): Boolean =
         i in 0 until Point.HEIGHT && j in 0 until Point.WIDTH
 
+/** (i, j) 形式の座標を序数に変換します。 */
 private fun idxToOrdinal(i: Int, j: Int): Int = i * Point.WIDTH + j
 
 /**
  * リバーシ盤上の位置を表す不変クラスです。
  * 同じ位置を表す Point オブジェクトは同一インスタンスであることが保証されます。
  */
+// 実装メモ：
+// [Point] は本質的に列挙だが、
+//   - 64個のメンバを列挙して実装するのはダサすぎる
+//   - HEIGHT, WIDTH で定義できるようにしたい
+// ということで、通常のクラスとして実装している。
 class Point private constructor(ordinal: Int) {
 
-    // MEMO:
-    // 本当は、いちいち Point.values.forEach { ～ }　などと書くのはダサいので、
-    // Point.forEach { ～ } などと書けるように、
-    //     companion object: Iterable<Point> by Point.values {
-    //         private val values: List<Point> = (0 until HEIGHT * WIDTH).map { Point[it] }.toList()
-    //     }
-    // としたかった。
-    // しかし、コンパイルは正常に通るものの、Point.forEach { ～ } などを実行すると
-    // 実行時に NullPointerException が発生してしまう。
-    // 初期化のタイミングの問題だと理解。
-    // やっぱ、外側の初期化済みオブジェクトじゃないとダメなのね...
     companion object {
 
         /** 座標平面（つまりリバーシ盤）の高さ */
@@ -33,16 +29,16 @@ class Point private constructor(ordinal: Int) {
         /** 座標平面（つまりリバーシ盤）の幅 */
         const val WIDTH = 8
 
+        /** 全ての [Point] インスタンスを保持するリスト */
         private val values: List<Point> = (0 until HEIGHT * WIDTH)
                 .map { Point(it) }
                 .toList()
 
+        /** 全ての [Point] インスタンスを保持するマップ */
         // 冗長ではあるが、アクセス効率を優先させる。
         private val map: Map<String, Point> = values.associateBy(Point::pos)
 
-        /**
-         * @return 全ての [Point] インスタンスが格納されたリストを返します。
-         */
+        /** 全ての [Point] インスタンスが格納されたリストを返します。 */
         // お勉強MEMO:
         // Point.values を初期化する際の Iterable.toList(): List<T> は
         // 可変オブジェクトを返す実装になってるっぽい。
@@ -51,8 +47,8 @@ class Point private constructor(ordinal: Int) {
         fun values(): List<Point> = values.toList()
 
         /**
-         * @return [i, j] 形式で指定された位置の Point インスタンスを返します。
-         * @throws IndexOutOfBoundsException [i, j] が範囲外の場合
+         * (i, j) 形式で指定された位置の Point インスタンスを返します。
+         * @throws IndexOutOfBoundsException (i, j) が範囲外の場合
          */
         operator fun get(i: Int, j: Int): Point {
             require(isValidIdx(i, j)) { "($i, $j)" }
@@ -60,7 +56,7 @@ class Point private constructor(ordinal: Int) {
         }
 
         /**
-         * @return ["a1"] 形式で指定された位置の Point インスタンスを返します。
+         * "a1" 形式で指定された位置の Point インスタンスを返します。
          * @throws IllegalArgumentException posが不正な形式または範囲外の場合
          */
         operator fun get(pos: String): Point = map[pos] ?: throw IllegalArgumentException(pos)
@@ -75,12 +71,11 @@ class Point private constructor(ordinal: Int) {
     /** "a1"～"h8" 形式の座標 */
     val pos: String = "%c%d".format('a' + j, 1 + i)
 
-    /**
-     * @return この点の指定された方向の次の点。次の点が無い場合は null
-     */
+    /** この点の指定された方向の次の点。次の点が無い場合は null */
     operator fun plus(direction: Direction): Point? {
         val ni: Int = i + direction.di
         val nj: Int = j + direction.dj
+        // これは null を返す設計が妥当だと信じる。nullを完全排除すればよいというものではない
         return if (isValidIdx(ni, nj)) get(ni, nj) else null
     }
 

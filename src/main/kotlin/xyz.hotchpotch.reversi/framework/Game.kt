@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
  * @param millisInTurn 一手当たりの制限時間（ミリ秒）
  * @param automatic 一手ごとに対話的に手を進める「対話モード」ではなく
  *                  自動でゲーム完了まで進める「自動モード」の場合は true
- * @param silent 標準出力への出力なしで進行させる場合は true
+ * @param silent 標準出力への出力なしで進行させる場合は true。
  *               一手ごとの状態をインタラクティブに出力しながら進行する場合は false
  */
 class Game(
@@ -27,7 +27,9 @@ class Game(
 ) : Playable<Color?> {
 
     companion object : PlayableFactory<Game> {
+
         override val description: String = "2プレーヤーで1回対戦します。"
+
         override fun arrangeViaConsole(): Game = Game(
                 Scanners.player("${Color.BLACK} のプレーヤー").get(),
                 Scanners.player("${Color.WHITE} のプレーヤー").get(),
@@ -64,7 +66,8 @@ class Game(
     private var currTurn: Color = Color.BLACK
 
     val resultBoard: Board
-        // TODO: ステータスチェックする！
+        // ゲーム実行前にアクセスされると "result"Board ではなくなっちゃう。
+        // 本当はステータス管理しそのチェックを行うべきだが、今回は面倒なので省略。許して。
         get() = board.toBoard()
 
     override fun play(): Color? {

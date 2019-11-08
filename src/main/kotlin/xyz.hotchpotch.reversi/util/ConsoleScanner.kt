@@ -23,6 +23,12 @@ private const val DEFAULT_CAUTION: String = "入力形式が不正です。再�
  * ```
  *
  * 上記は一例です。その他の機能については各メンバの説明を参照してください。
+ *
+ * @param T 最終的に取得したいオブジェクトの型
+ * @param judge 標準入力から入力された文字列が要求する形式を満たしているかをチェックする関数
+ * @param converter 標準入力から入力された文字列を目的の型のオブジェクトに変換する関数
+ * @param prompt ユーザーに入力を促すために標準出力に表示する文字列
+ * @param caution ユーザーが誤った形式の入力を行った場合にそれを知らせるために標準出力に表示する文字列
  */
 class ConsoleScanner<out T>(
         private val judge: (String) -> Boolean,
@@ -38,8 +44,7 @@ class ConsoleScanner<out T>(
          *
          * @param pattern 取得する文字列の形式
          * @param prompt ユーザーに入力を促す文字列
-         * @param caution ユーザーが入力を誤ったときに再入力を促す文字列
-         * @return 指定した形式の文字列を取得するスキャナー
+         * @param caution ユーザーが入力を誤ったときにそれを知らせる文字列
          */
         fun forString(
                 pattern: Pattern,
@@ -58,8 +63,7 @@ class ConsoleScanner<out T>(
          * @param startInclusive 取得したい範囲の下限値（この値を範囲に含みます）
          * @param endInclusive 取得したい範囲の上限値（この値を範囲に含みます）
          * @param prompt ユーザーに入力を促す文字列
-         * @param caution ユーザーが入力を誤ったときに再入力を促す文字列
-         * @return 指定した範囲の整数を取得するスキャナー
+         * @param caution ユーザーが入力を誤ったときにそれを知らせる文字列
          */
         fun forInt(
                 startInclusive: Int,
@@ -85,8 +89,7 @@ class ConsoleScanner<out T>(
          * @param startInclusive 取得したい範囲の下限値（この値を範囲に含みます）
          * @param endInclusive 取得したい範囲の上限値（この値を範囲に含みます）
          * @param prompt ユーザーに入力を促す文字列
-         * @param caution ユーザーが入力を誤ったときに再入力を促す文字列
-         * @return 指定した範囲の整数を取得するスキャナー
+         * @param caution ユーザーが入力を誤ったときにそれを知らせる文字列
          */
         // MEMO: IntとLongの2回書かなくてよい方法、何かないのかしら・・・
         fun forLong(
@@ -112,8 +115,7 @@ class ConsoleScanner<out T>(
          *
          * @param list 要素選択対象のリスト
          * @param prompt ユーザーに入力を促す文字列
-         * @param caution ユーザーが入力を誤ったときに再入力を促す文字列
-         * @return 指定されたリストの中から１つの要素を選択させるスキャナー
+         * @param caution ユーザーが入力を誤ったときにそれを知らせる文字列
          */
         fun <U> forList(
                 list: List<U>,
@@ -143,8 +145,7 @@ class ConsoleScanner<out T>(
          *
          * @param enumClass 要素選択対象の列挙型
          * @param prompt ユーザーに入力を促す文字列
-         * @param caution ユーザーが入力を誤ったときに再入力を促す文字列
-         * @return 指定された列挙型の要素の中から１つを選択させるスキャナー
+         * @param caution ユーザーが入力を誤ったときにそれを知らせる文字列
          */
         fun <U : Enum<out U>> forEnum(
                 enumClass: KClass<U>,
@@ -175,8 +176,7 @@ class ConsoleScanner<out T>(
      * 標準入力から対話的にユーザー入力値を取得し、目的の型に変換して返します。
      * 要求する形式の入力値が得られるまで、ユーザーに何度も再入力を求めます。
      */
-    // MEMO: 割り込みに対応するとより良い。
-    // @see https://github.com/nmby/toolbox/blob/master/project/src/main/java/xyz/hotchpotch/util/console/ConsoleScanner.java#L424
+    // TODO: 割り込みに対応する。
     fun get(): T {
         while (true) {
             print(prompt)

@@ -65,9 +65,7 @@ interface PlayableFactory<out T : Playable<Any?>> {
     /** この [Playable] の説明 */
     val description: String
 
-    /**
-     * 標準入出力から実行条件を取得して [Playable] オブジェクトを生成するファクトリ
-     */
+    /** 標準入出力から実行条件を取得して [Playable] オブジェクトを生成するファクトリ */
     fun arrangeViaConsole(): T
 }
 

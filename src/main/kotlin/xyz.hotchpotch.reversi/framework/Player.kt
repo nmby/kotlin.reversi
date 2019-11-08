@@ -37,9 +37,10 @@ interface Player {
     }
 
     /**
+     * 今回の手として石を打つ場所。パスの場合は null
+     *
      * @param board 現在のリバーシ盤
      * @param millisInGame ゲーム内の残り持ち時間（ミリ秒）。手番ごとに消費した時間が減算されます。
-     * @return 今回の手として石を打つ場所。パスの場合は null
      */
     fun choosePoint(board: Board, millisInGame: Long): Point?
 }
@@ -76,7 +77,8 @@ interface PlayerFactory {
  * @param millisInGame ゲーム内の持ち時間（ミリ秒）
  * @param millisInTurn 一手当たりの持ち時間（ミリ秒）
  * @return 生成されたプレーヤーインスタンス
- * @throws IllegalArgumentException 指定された [Player] 実装クラスのコンパニオンオブジェクトが [PlayerFactory] を実装しない場合
+ * @throws IllegalArgumentException 指定された [Player] 実装クラスのコンパニオンオブジェクトが
+ *                                  [PlayerFactory] を実装しない場合
  */
 fun createPlayer(
         playerClass: KClass<out Player>,

@@ -2,6 +2,7 @@ package xyz.hotchpotch.reversi.framework
 
 import xyz.hotchpotch.reversi.Board
 import xyz.hotchpotch.reversi.Color
+import xyz.hotchpotch.reversi.count
 import kotlin.reflect.KClass
 
 /**
@@ -14,7 +15,7 @@ import kotlin.reflect.KClass
  * @param times 対戦回数
  * @param automatic 一ゲームごとに対話的に手を進める「対話モード」ではなく
  *                  自動でマッチ終了まで進める「自動モード」の場合は true
- * @param silent 標準出力への出力なしで進行させる場合は true
+ * @param silent 標準出力への出力なしで進行させる場合は true。
  *               一ゲームごとの結果をインタラクティブに出力しながら進行する場合は false
  */
 class Match(
@@ -28,7 +29,9 @@ class Match(
 ) : Playable<Map<KClass<out Player>, Record>> {
 
     companion object : PlayableFactory<Match> {
+
         override val description: String = "2プレーヤーで黒白を入れ替えながら複数回対戦します。"
+
         override fun arrangeViaConsole(): Match = Match(
                 Scanners.player("プレーヤーA").get(),
                 Scanners.player("プレーヤーB").get(),
@@ -103,7 +106,7 @@ class Match(
         }
         return mapOf(
                 playerA to recordA,
-                playerB to recordA.reversed()
+                playerB to recordA.opposite()
         )
     }
 }

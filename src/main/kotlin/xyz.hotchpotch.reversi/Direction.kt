@@ -2,6 +2,9 @@ package xyz.hotchpotch.reversi
 
 /**
  * リバーシ版上の方向を表す列挙型です。
+ *
+ * @property di 縦方向のベクトル
+ * @property dj 横方向のベクトル
  */
 enum class Direction(internal val di: Int, internal val dj: Int) {
 
