@@ -20,20 +20,21 @@ interface Player {
 
     companion object {
 
-        /** 既知の [Player] 実装クラスの一覧 */
+        /** 既知の自動プレーヤーの一覧 */
         // 本当はリフレクションか何かで実現したいところ
-        val implementations: List<KClass<out Player>>
-            // お勉強MEMO:
-            // こういうの、思わずカスタムゲッターではなくそのまま初期値として代入してしまいそうになる。
-            // 気を付ける必要あり。
-            // というか、Kotlin の流儀では可変オブジェクトをそのまま返しちゃってもよいのか？
-            // いや、オブジェクト指向である以上、それはないはず
+        val aiPlayers: List<KClass<out Player>>
+            // お勉強MEMO：
+            // 可変オブジェクトをそのまま返す訳にはいかないので、
+            // コピーを返すためにカスタムゲッターを定義。
             get() = listOf(
-                    ManualPlayer::class,
                     SimplestPlayer::class,
                     RandomPlayer::class,
                     MonteCarloPlayer::class
             )
+
+        /** 手動プレーヤーも含む既知の [Player] 実装クラスの一覧 */
+        val allPlayers: List<KClass<out Player>>
+            get() = aiPlayers + ManualPlayer::class
     }
 
     /**

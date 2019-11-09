@@ -31,8 +31,8 @@ class Game(
         override val description: String = "2プレーヤーで1回対戦します。"
 
         override fun arrangeViaConsole(): Game = Game(
-                Scanners.player("${Color.BLACK} のプレーヤー").get(),
-                Scanners.player("${Color.WHITE} のプレーヤー").get(),
+                Scanners.player("${Color.BLACK} のプレーヤー", true).get(),
+                Scanners.player("${Color.WHITE} のプレーヤー", true).get(),
                 Scanners.millisInGame.get(),
                 Scanners.millisInTurn.get()
         )

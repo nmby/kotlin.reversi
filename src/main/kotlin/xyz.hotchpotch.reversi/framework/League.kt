@@ -67,7 +67,11 @@ class League(
                         silent = true
                 )
                 val result: Map<KClass<out Player>, Record> = match.play()
-                val xRecord: Record = result[playerX]!!
+                // お勉強MEMO：
+                // IntelliJが 「result[playerX]!!」 に対して文句を言うので、
+                // 「result[playerX] ?: error("～")」 に変更した。
+                // null にはならないことを実装者は知っている訳だが、どうにかならないかしら。
+                val xRecord: Record = result[playerX] ?: error("nullな訳ないんだが・・・")
 
                 if (!silent) {
                     println("${'A' + i}の勝ち：${xRecord.wins}, " +
@@ -123,9 +127,9 @@ private fun arrangePlayers(): List<KClass<out Player>> {
     while (true) {
         val n: Int = ConsoleScanner.forInt(
                 startInclusive = 0,
-                endInclusive = Player.implementations.size,
+                endInclusive = Player.aiPlayers.size,
                 prompt = "\t0: (選択終了)\n" +
-                        Player.implementations.mapIndexed { idx, clz ->
+                        Player.aiPlayers.mapIndexed { idx, clz ->
                             "\t${if (selected.contains(idx)) "【選択済み】 " else ""}" +
                                     "${idx + 1}: ${clz.qualifiedName}\n"
                         }.joinToString("") +
@@ -140,5 +144,5 @@ private fun arrangePlayers(): List<KClass<out Player>> {
             println("2つ以上のプレーヤーを選択してください。")
         }
     }
-    return selected.sorted().map { Player.implementations[it] }
+    return selected.sorted().map { Player.aiPlayers[it] }
 }

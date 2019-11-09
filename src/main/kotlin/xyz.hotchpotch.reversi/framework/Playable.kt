@@ -72,19 +72,22 @@ interface PlayableFactory<out T : Playable<Any?>> {
 /** [Playable] 実装クラスの実行条件を標準入力から取得するためのスキャナーを集めたものです。 */
 object Scanners {
 
-    private val playersList: String = Player.implementations
-            .mapIndexed { idx, playerClass -> "\t${idx + 1} : ${playerClass.qualifiedName}" }
-            .joinToString("\n")
+    private fun playersList(includeManualPlayer: Boolean): String =
+            (if (includeManualPlayer) Player.allPlayers else Player.aiPlayers)
+                    .mapIndexed { idx, playerClass -> "\t${idx + 1} : ${playerClass.qualifiedName}" }
+                    .joinToString("\n")
 
     /**
      * プレーヤークラスを取得するためのスキャナー
      *
      * @param playerDesc 標準出力に表示するプレーヤーの呼称（"●プレーヤー" や "プレーヤーA" など）
+     * @param includeManualPlayer 手動プレーヤーも対象に含める場合は true
      */
-    fun player(playerDesc: String): ConsoleScanner<KClass<out Player>> = ConsoleScanner.forList(
-            list = Player.implementations,
-            prompt = "${playersList}\n${playerDesc}を番号で選択してください > "
-    )
+    fun player(playerDesc: String, includeManualPlayer: Boolean): ConsoleScanner<KClass<out Player>> =
+            ConsoleScanner.forList(
+                    list = if (includeManualPlayer) Player.allPlayers else Player.aiPlayers,
+                    prompt = "${playersList(includeManualPlayer)}\n${playerDesc}を番号で選択してください > "
+            )
 
     private const val minInGame: Long = 100
     private const val maxInGame: Long = 1000 * 60 * 60
