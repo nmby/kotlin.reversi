@@ -66,7 +66,7 @@ class Game(
     private var currTurn: Color = Color.BLACK
 
     override fun play(): GameResult {
-        check(board.isGameOngoing())
+        check(board.count(Color.BLACK) + board.count(Color.WHITE) == 4)
         { "Gameクラスはいわゆるワンショットです。ゲームごとに新たなインスタンスを利用してください。" }
 
         if (!silent) {
