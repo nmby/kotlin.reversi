@@ -20,5 +20,5 @@ class SimplestPlayer(private val color: Color) : Player {
 
     /** リバーシ盤を左上から順に走査し、最初に見つかった置ける場所を自身の手として返します。 */
     override fun choosePoint(board: Board, millisInGame: Long): Point? =
-            Point.values().firstOrNull { board.canPutAt(color, it) }
+            Point.values.firstOrNull { board.canPutAt(color, it) }
 }

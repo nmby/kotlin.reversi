@@ -17,7 +17,7 @@ internal class BoardTest {
     fun initialBoards(board: Board) {
 
         // 生成直後の石の配置のテスト
-        Point.values().forEach {
+        Point.values.forEach {
             when (it.pos) {
                 "d4", "e5" -> assertSame(Color.WHITE, board[it])
                 "d5", "e4" -> assertSame(Color.BLACK, board[it])
@@ -69,7 +69,7 @@ internal class BoardTest {
     fun plus(board: Board) {
 
         // 一手目：全パターン検証する。
-        Point.values().forEach {
+        Point.values.forEach {
             when (it.pos) {
                 "d3" -> assertEquals(
                         (""

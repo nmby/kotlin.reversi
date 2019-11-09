@@ -30,21 +30,14 @@ class Point private constructor(ordinal: Int) {
         const val WIDTH = 8
 
         /** 全ての [Point] インスタンスを保持するリスト */
-        private val values: List<Point> = (0 until HEIGHT * WIDTH)
+        val values: List<Point> = (0 until HEIGHT * WIDTH)
                 .map { Point(it) }
                 .toList()
+            get() = field.toList()
 
         /** 全ての [Point] インスタンスを保持するマップ */
         // 冗長ではあるが、アクセス効率を優先させる。
         private val map: Map<String, Point> = values.associateBy(Point::pos)
-
-        /** 全ての [Point] インスタンスが格納されたリストを返します。 */
-        // お勉強MEMO:
-        // Point.values を初期化する際の Iterable.toList(): List<T> は
-        // 可変オブジェクトを返す実装になってるっぽい。
-        // Kotlinではオブジェクトの不変性ってあんま意識しないものなのかな・・・？？？？？
-        // ということで、コピーを返す実装に修正。
-        fun values(): List<Point> = values.toList()
 
         /**
          * (i, j) 形式で指定された位置の Point インスタンスを返します。

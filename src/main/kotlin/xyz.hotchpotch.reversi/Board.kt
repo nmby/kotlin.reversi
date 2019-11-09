@@ -20,11 +20,11 @@ interface Board {
 // この方が、インタフェース内がすっきりし、実装（オーバーライド）すべきメンバが分かりやすくなる気がする。
 
 /** このリバーシ盤上の指定された色の石の数を返します。 */
-fun Board.count(color: Color): Int = Point.values().count { this[it] === color }
+fun Board.count(color: Color): Int = Point.values.count { this[it] === color }
 
 /** このリバーシ盤を同等の内容のマップに変換して返します。 */
 private fun Board.toMap(): Map<Point, Color> =
-        Point.values().filter { this[it] !== null }.associateWith { this[it]!! }
+        Point.values.filter { this[it] !== null }.associateWith { this[it]!! }
 
 /**
  * このリバーシ盤に指定された手を適用して得られるリバーシ盤を新たに生成して返します。

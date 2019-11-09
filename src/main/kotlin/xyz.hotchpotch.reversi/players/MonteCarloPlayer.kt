@@ -37,7 +37,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         val now: Instant = Instant.now()
 
         // 石を置ける位置
-        val availables = Point.values().filter { board.canPutAt(color, it) }
+        val availables = Point.values.filter { board.canPutAt(color, it) }
 
         // 石を置ける位置が0（パス）または1の場合は、直ちに手が決まる。
         if (availables.isEmpty()) return null
@@ -65,7 +65,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     private fun deadline(now: Instant, board: Board, millisInGame: Long): Instant {
         // このロジックは凝ろうと思えば色々と凝れるし、それで強くもなるが、
         // 面倒くさいので一旦これで
-        val remainingMyTurns = (Point.values().filter { board[it] === null }.count() + 1) / 2
+        val remainingMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
         val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainingMyTurns) - MARGIN
         return now.plusMillis(millisForThisTurn)
     }
@@ -104,7 +104,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     private tailrec fun playOut1(board: MutableBoard, currTurn: Color): Color? {
         if (!board.isGameOngoing()) return board.winner()
 
-        val availables = Point.values().filter { board.canPutAt(currTurn, it) }
+        val availables = Point.values.filter { board.canPutAt(currTurn, it) }
         if (availables.isNotEmpty()) board.apply(Move(currTurn, availables.random()))
         return playOut1(board, currTurn.reversed())
     }

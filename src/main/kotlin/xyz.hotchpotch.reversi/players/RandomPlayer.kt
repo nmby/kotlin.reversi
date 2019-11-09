@@ -20,7 +20,7 @@ class RandomPlayer(private val color: Color) : Player {
 
     /** 石を置ける位置の中からランダムで手を選んで返します。 */
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
-        val availables = Point.values().filter { board.canPutAt(color, it) }
+        val availables = Point.values.filter { board.canPutAt(color, it) }
         return if (availables.isEmpty()) null else availables.random()
     }
 }

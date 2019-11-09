@@ -13,7 +13,7 @@ fun Board.isGameOngoing(): Boolean = canPut(Color.BLACK) || canPut(Color.WHITE)
 // お勉強MEMO：
 // 意味が自明なパラメータの説明は省略。
 // javadocに慣れたJava脳からするとソワソワするが、「形式よりも実益」を重視するのがkotlin流儀だと理解。
-fun Board.canPut(color: Color): Boolean = Point.values().any { canPutAt(color, it) }
+fun Board.canPut(color: Color): Boolean = Point.values.any { canPutAt(color, it) }
 
 /** このリバーシ盤の指定された位置に指定された色の石を置ける場合に true を返します。 */
 fun Board.canPutAt(color: Color, point: Point): Boolean = this[point] === null

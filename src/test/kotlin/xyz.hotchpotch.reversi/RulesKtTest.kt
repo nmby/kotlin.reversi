@@ -77,7 +77,7 @@ internal class RulesKtTest {
                 "7 ○○○○○○○・%n" +
                 "8 ・・・・・・・・%n").format())
 
-        Point.values().forEach {
+        Point.values.forEach {
             // 黒のテスト
             when (it.pos) {
                 "a8" -> assertEquals(setOf(Point["b7"]), board.reversibles(Color.BLACK, it))
@@ -117,7 +117,7 @@ internal class RulesKtTest {
 
     @Test
     fun canPutAt() {
-        Point.values().forEach {
+        Point.values.forEach {
             // 黒のテスト
             when (it.pos) {
                 "a8", "b8", "c8", "d8", "e8", "f8", "g8",
@@ -145,7 +145,7 @@ internal class RulesKtTest {
 
     @Test
     fun canApply() {
-        Point.values().forEach {
+        Point.values.forEach {
             // 黒のテスト
             when (it.pos) {
                 "a8", "b8", "c8", "d8", "e8", "f8", "g8",
@@ -165,7 +165,7 @@ internal class RulesKtTest {
 
         // ゲーム終了状態の場合
         val empty: Board = boardOf(mapOf())
-        Point.values().forEach {
+        Point.values.forEach {
             assertFalse(empty.canApply(Move(Color.BLACK, it)))
             assertFalse(empty.canApply(Move(Color.WHITE, it)))
         }
