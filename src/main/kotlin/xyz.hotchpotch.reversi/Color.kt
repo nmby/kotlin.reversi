@@ -11,9 +11,7 @@ enum class Color(private val symbol: String) {
     /** 白 */
     WHITE("○");
 
-    /**
-     * @return 自身と反対の色
-     */
+    /** 自身と反対の色を返します。 */
     fun reversed(): Color = if (this === BLACK) WHITE else BLACK
 
     // MEMO: こんな自明な型 「: String」 を書くのはきっとダサいんだろうけど、

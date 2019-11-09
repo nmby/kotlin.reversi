@@ -8,9 +8,7 @@ package xyz.hotchpotch.reversi
  */
 data class Move constructor(val color: Color, val point: Point?) {
 
-    /**
-     * @return この手がパスを表す場合に true を返します。
-     */
+    /** この手がパスを表す場合に true を返します。 */
     fun isPass(): Boolean = point === null
 
     override fun toString(): String = "$color: %s".format(point ?: "PASS")

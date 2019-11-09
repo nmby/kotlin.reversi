@@ -20,26 +20,28 @@ interface Player {
 
     companion object {
 
-        /** 既知の [Player] 実装クラスの一覧 */
+        /** 既知の自動プレーヤーの一覧 */
         // 本当はリフレクションか何かで実現したいところ
-        val implementations: List<KClass<out Player>>
-            // お勉強MEMO:
-            // こういうの、思わずカスタムゲッターではなくそのまま初期値として代入してしまいそうになる。
-            // 気を付ける必要あり。
-            // というか、Kotlin の流儀では可変オブジェクトをそのまま返しちゃってもよいのか？
-            // いや、オブジェクト指向である以上、それはないはず
-            get() = listOf(
-                    ManualPlayer::class,
-                    SimplestPlayer::class,
-                    RandomPlayer::class,
-                    MonteCarloPlayer::class
-            )
+        val aiPlayers: List<KClass<out Player>> = listOf(
+                SimplestPlayer::class,
+                RandomPlayer::class,
+                MonteCarloPlayer::class
+        )
+            // お勉強MEMO：
+            // 可変オブジェクトをそのまま返す訳にはいかないので、
+            // コピーを返すためにカスタムゲッターを定義。
+            get() = field.toList()
+
+        /** 手動プレーヤーも含む既知の [Player] 実装クラスの一覧 */
+        val allPlayers: List<KClass<out Player>> = aiPlayers + ManualPlayer::class
+            get() = field.toList()
     }
 
     /**
+     * 今回の手として石を打つ場所。パスの場合は null
+     *
      * @param board 現在のリバーシ盤
      * @param millisInGame ゲーム内の残り持ち時間（ミリ秒）。手番ごとに消費した時間が減算されます。
-     * @return 今回の手として石を打つ場所。パスの場合は null
      */
     fun choosePoint(board: Board, millisInGame: Long): Point?
 }
@@ -76,7 +78,8 @@ interface PlayerFactory {
  * @param millisInGame ゲーム内の持ち時間（ミリ秒）
  * @param millisInTurn 一手当たりの持ち時間（ミリ秒）
  * @return 生成されたプレーヤーインスタンス
- * @throws IllegalArgumentException 指定された [Player] 実装クラスのコンパニオンオブジェクトが [PlayerFactory] を実装しない場合
+ * @throws IllegalArgumentException 指定された [Player] 実装クラスのコンパニオンオブジェクトが
+ *                                  [PlayerFactory] を実装しない場合
  */
 fun createPlayer(
         playerClass: KClass<out Player>,
