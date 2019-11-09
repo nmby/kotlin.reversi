@@ -23,9 +23,6 @@ private const val MARGIN: Long = 45
  */
 class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long) : Player {
 
-    /** 思考時間が無いときに判断を委譲するプレーヤー */
-    private val proxy: Player = RandomPlayer.create(color, 0, 0)
-
     companion object : PlayerFactory {
         override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
                 MonteCarloPlayer(color, millisInTurn)
@@ -42,8 +39,10 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         val availables = Point.values.filter { board.canPutAt(color, it) }
 
         // 石を置ける位置が0（パス）または1の場合は、直ちに手が決まる。
-        if (availables.isEmpty()) return null
-        else if (availables.size == 1) return availables[0]
+        when (availables.size) {
+            0 -> return null
+            1 -> return availables[0]
+        }
 
         val totalWins: MutableMap<Point, Long> = mutableMapOf()
 
@@ -59,8 +58,9 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         // 最も勝ち数が多かった手を選択して返す。
         // maxBy を使うと同成績の位置が複数あったときに結果が偏る気がするけど、まぁいいや
         return if (totalWins.isNotEmpty()) totalWins.maxBy { it.value }!!.key
-        // 時間がなく一度も施行できなかった場合はプロキシに委ねる。
-        else proxy.choosePoint(board, millisInGame)
+
+        // 時間がなく一度も施行できなかった場合はランダムに選ぶ。
+        else availables.random()
     }
 
     /** 今回の手に費やせる時間を計算し、最後の施行を始めるデッドラインを返す。 */
