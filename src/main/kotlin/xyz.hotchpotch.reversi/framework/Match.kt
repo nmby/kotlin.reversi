@@ -74,14 +74,14 @@ class Match(
             ).play()
 
             if (!silent) {
-                println(gameResult.resultBoard.toString().prependIndent("\t"))
+                println(gameResult.board.toString().prependIndent("\t"))
                 print(when (gameResult.winner) {
                     colorA -> "Aの勝ちです。"
                     colorA.reversed() -> "Bの勝ちです。"
                     else -> "引き分けです。"
                 })
-                print("（A=${colorA}：${gameResult.resultBoard.count(colorA)}, " +
-                        "B=${colorA.reversed()}:${gameResult.resultBoard.count(colorA.reversed())}） > ")
+                print("（A=${colorA}：${gameResult.board.count(colorA)}, " +
+                        "B=${colorA.reversed()}:${gameResult.board.count(colorA.reversed())}） > ")
                 if (automatic) println() else readLine()
             }
             when (gameResult.winner) {

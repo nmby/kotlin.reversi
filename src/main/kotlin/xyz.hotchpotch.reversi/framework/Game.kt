@@ -168,10 +168,10 @@ class Game(
  * ゲーム結果を表します。
  *
  * @param winner 勝者の石の色。引き分けの場合は null
- * @param resultBoard ゲーム終了時点のリバーシ盤
+ * @param board ゲーム終了時点のリバーシ盤
  */
 // お勉強MEMO: 実験として sealed class を使ってみる。
-sealed class GameResult(val winner: Color?, val resultBoard: Board) {
+sealed class GameResult(val winner: Color?, val board: Board) {
     abstract val announce: String
 
     /**
@@ -182,7 +182,7 @@ sealed class GameResult(val winner: Color?, val resultBoard: Board) {
      * @param remainedMillisWhite 白プレーヤーの残り持ち時間（ミリ秒）
      */
     class NormalSettlement(board: Board, remainedMillisBlack: Long, remainedMillisWhite: Long)
-        : GameResult(winner = board.winner(), resultBoard = board.toBoard()) {
+        : GameResult(winner = board.winner(), board = board.toBoard()) {
 
         override val announce: String = {
             val str: StringBuilder = StringBuilder()
@@ -205,7 +205,7 @@ sealed class GameResult(val winner: Color?, val resultBoard: Board) {
      * @param board ゲーム終了時点のリバーシ盤
      */
     class SettlementWithIllegalMove(violator: Color, board: Board)
-        : GameResult(winner = violator.reversed(), resultBoard = board.toBoard()) {
+        : GameResult(winner = violator.reversed(), board = board.toBoard()) {
 
         override val announce: String = "ルール違反の手が指定されました。 $violator の負けです。"
     }
@@ -219,7 +219,7 @@ sealed class GameResult(val winner: Color?, val resultBoard: Board) {
      * @param board ゲーム終了時点のリバーシ盤
      */
     class OverTheTimeLimitInGame(violator: Color, limit: Long, exceeded: Long, board: Board)
-        : GameResult(winner = violator.reversed(), resultBoard = board.toBoard()) {
+        : GameResult(winner = violator.reversed(), board = board.toBoard()) {
 
         override val announce: String =
                 "ゲーム内の持ち時間（${limit}ミリ秒）を${exceeded}ミリ秒超過しました。 $violator の負けです。"
@@ -234,7 +234,7 @@ sealed class GameResult(val winner: Color?, val resultBoard: Board) {
      * @param board ゲーム終了時点のリバーシ盤
      */
     class OverTheTimeLimitInTurn(violator: Color, limit: Long, exceeded: Long, board: Board)
-        : GameResult(winner = violator.reversed(), resultBoard = board.toBoard()) {
+        : GameResult(winner = violator.reversed(), board = board.toBoard()) {
 
         override val announce: String =
                 "一手当たりの制限時間（${limit}ミリ秒）を${exceeded}ミリ秒超過しました。 $violator の負けです。"
@@ -249,7 +249,7 @@ sealed class GameResult(val winner: Color?, val resultBoard: Board) {
      */
     // TODO: もうちょっとマシな名前を考える
     class HeHasGoneMad(violator: Color, cause: Exception, board: Board)
-        : GameResult(winner = violator.reversed(), resultBoard = board.toBoard()) {
+        : GameResult(winner = violator.reversed(), board = board.toBoard()) {
 
         override val announce: String = "$violator の思考中に例外が発生しました。 $violator の負けです。\n" +
                 cause.stackTrace.joinToString("\n") { toString() }
