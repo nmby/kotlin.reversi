@@ -1,6 +1,5 @@
 package xyz.hotchpotch.reversi.framework
 
-import xyz.hotchpotch.reversi.Board
 import xyz.hotchpotch.reversi.Color
 import xyz.hotchpotch.reversi.count
 import kotlin.reflect.KClass
@@ -65,29 +64,27 @@ class Match(
         (1..times).forEach {
             if (!silent) println("\n${it}回戦目（A=${colorA}, B=${colorA.reversed()}）\n")
 
-            val game = Game(
+            val gameResult: GameResult = Game(
                     playerBlack = if (colorA == Color.BLACK) playerA else playerB,
                     playerWhite = if (colorA == Color.BLACK) playerB else playerA,
                     millisInGame = millisInGame,
                     millisInTurn = millisInTurn,
                     automatic = true,
                     silent = true
-            )
-            val winner: Color? = game.play()
-            val board: Board = game.resultBoard
+            ).play()
 
             if (!silent) {
-                println(board.toString().prependIndent("\t"))
-                print(when (winner) {
+                println(gameResult.resultBoard.toString().prependIndent("\t"))
+                print(when (gameResult.winner) {
                     colorA -> "Aの勝ちです。"
                     colorA.reversed() -> "Bの勝ちです。"
                     else -> "引き分けです。"
                 })
-                print("（A=${colorA}：${board.count(colorA)}, " +
-                        "B=${colorA.reversed()}:${board.count(colorA.reversed())}） > ")
+                print("（A=${colorA}：${gameResult.resultBoard.count(colorA)}, " +
+                        "B=${colorA.reversed()}:${gameResult.resultBoard.count(colorA.reversed())}） > ")
                 if (automatic) println() else readLine()
             }
-            when (winner) {
+            when (gameResult.winner) {
                 colorA -> recordA.wins++
                 colorA.reversed() -> recordA.losses++
                 else -> recordA.draws++
