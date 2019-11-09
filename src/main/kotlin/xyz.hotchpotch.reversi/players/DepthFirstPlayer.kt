@@ -52,7 +52,7 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
         }
     }
 
-    /** 今回の手に費やせる時間を計算し、最後の施行を始めるデッドラインを返す。 */
+    /** 今回の手に費やせる時間を計算し、探索を切り上げるデッドラインを返す。 */
     private fun deadline(board: Board, millisInGame: Long): Instant {
         val remainingMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
         val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainingMyTurns) - MARGIN
@@ -63,7 +63,7 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
     private fun search(board: Board, currColor: Color): Color? {
         if (!board.isGameOngoing()) return board.winner()
 
-        // 時間切れの場合は処理を中断する。
+        // 時間切れの場合は探索を切り上げる。
         if (deadline < Instant.now()) throw TimeUpException()
 
         val availables: List<Point> = Point.values.filter { board.canPutAt(currColor, it) }
