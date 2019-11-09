@@ -11,6 +11,8 @@ import java.util.stream.Stream
 // 残り時間や処理性能とかに応じてここを可変にするとより良くなるんだろうけど
 // 面倒なので今回はこれで。
 private const val TIMES: Int = 25
+
+/** 今回の手に費やせる時間を計算する際の余裕代 */
 private const val MARGIN: Long = 45
 
 /**
