@@ -46,9 +46,9 @@ interface Playable<out T> {
         // Playable をインタフェースではなく sealed クラスにするとよいのかも？？
         // と思って一度してみたものの、
         // 全実装クラスをここに記述しなくてはならず不細工になる割には旨味が少ないので、やめた。
-        val types: List<KClass<out Playable<*>>>
-            // 本当はリフレクションで実現できると良いのだろうけど、今回はこれで良しとする。
-            get() = listOf(Game::class, Match::class, League::class)
+        // 本当はリフレクションで実現できると良いのだろうけど、今回はこれで良しとする。
+        val types: List<KClass<out Playable<*>>> = listOf(Game::class, Match::class, League::class)
+            get() = field.toList()
     }
 
     /** この [Playable] を実行して結果を返します。 */

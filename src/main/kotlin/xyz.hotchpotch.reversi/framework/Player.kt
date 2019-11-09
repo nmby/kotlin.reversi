@@ -22,19 +22,19 @@ interface Player {
 
         /** 既知の自動プレーヤーの一覧 */
         // 本当はリフレクションか何かで実現したいところ
-        val aiPlayers: List<KClass<out Player>>
+        val aiPlayers: List<KClass<out Player>> = listOf(
+                SimplestPlayer::class,
+                RandomPlayer::class,
+                MonteCarloPlayer::class
+        )
             // お勉強MEMO：
             // 可変オブジェクトをそのまま返す訳にはいかないので、
             // コピーを返すためにカスタムゲッターを定義。
-            get() = listOf(
-                    SimplestPlayer::class,
-                    RandomPlayer::class,
-                    MonteCarloPlayer::class
-            )
+            get() = field.toList()
 
         /** 手動プレーヤーも含む既知の [Player] 実装クラスの一覧 */
-        val allPlayers: List<KClass<out Player>>
-            get() = aiPlayers + ManualPlayer::class
+        val allPlayers: List<KClass<out Player>> = aiPlayers + ManualPlayer::class
+            get() = field.toList()
     }
 
     /**
