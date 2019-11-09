@@ -68,7 +68,7 @@ class League(
                 )
                 val result: Map<KClass<out Player>, Record> = match.play()
                 // お勉強MEMO：
-                // IntelliJが 「result[playerX]!!」 に対して文句を言うので、
+                // IntelliJ が 「result[playerX]!!」 に対して文句を言うので、
                 // 「result[playerX] ?: error("～")」 に変更した。
                 // null にはならないことを実装者は知っている訳だが、どうにかならないかしら。
                 val xRecord: Record = result[playerX] ?: error("nullな訳ないんだが・・・")

@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
 private const val DEFAULT_PROMPT: String = "> "
-private const val DEFAULT_CAUTION: String = "入力形式が不正です。再入力してください。"
+private const val DEFAULT_CAUTION: String = "入力形式が不正です。"
 
 /**
  * 標準入出力から対話的にユーザー入力値を取得するためのスキャナーです。
@@ -168,6 +168,22 @@ class ConsoleScanner<out T>(
                 },
                 converter = { enumClass.java.enumConstants[it.toInt() - 1] },
                 prompt = prompt,
+                caution = caution
+        )
+
+        /**
+         * [y/N] を選択させるスキャナーを生成します。
+         *
+         * @param question [y/N] で答えさせたい質問
+         * @param caution ユーザーが入力を誤ったときにそれを知らせる文字列
+         */
+        fun yesOrNo(
+                question: String,
+                caution: String = DEFAULT_CAUTION
+        ): ConsoleScanner<Boolean> = ConsoleScanner(
+                judge = { it.toLowerCase() == "y" || it.toLowerCase() == "n" },
+                converter = { it.toLowerCase() == "y" },
+                prompt = "$question [y/N] > ",
                 caution = caution
         )
     }

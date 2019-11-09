@@ -34,7 +34,8 @@ class Game(
                 Scanners.player("${Color.BLACK} のプレーヤー", true).get(),
                 Scanners.player("${Color.WHITE} のプレーヤー", true).get(),
                 Scanners.millisInGame.get(),
-                Scanners.millisInTurn.get()
+                Scanners.millisInTurn.get(),
+                Scanners.automatic.get()
         )
     }
 

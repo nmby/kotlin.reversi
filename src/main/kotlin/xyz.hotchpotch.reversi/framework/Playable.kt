@@ -7,6 +7,7 @@ import kotlin.reflect.full.companionObjectInstance
 // お勉強MEMO:
 // 一つのファイルに複数の要素を詰め込むの、どう考えればよいんだろう。
 // 今回は実験として色々モリモリにしてみた。
+
 fun main() {
     val menuList: String = Playable.types
             .mapIndexed { idx, clazz ->
@@ -20,10 +21,7 @@ fun main() {
             prompt = "${menuList}\n番号で選択してください > "
     )
 
-    val isRepeat: ConsoleScanner<Boolean> = ConsoleScanner(
-            judge = { true },
-            converter = { it == "y" },
-            prompt = "\nもう一度行いますか？ (y/N) > ")
+    val isRepeat: ConsoleScanner<Boolean> = ConsoleScanner.yesOrNo("\nもう一度行いますか？")
 
     do {
         val factory: Any? = selectMenu.get().companionObjectInstance
@@ -118,4 +116,8 @@ object Scanners {
             endInclusive = maxTimes,
             prompt = "対戦回数を ${minTimes}～${maxTimes} の範囲で指定してください > "
     )
+
+    /** 自動実行モードか否かを取得するためのスキャナー */
+    val automatic: ConsoleScanner<Boolean> = ConsoleScanner.yesOrNo(
+            question = "自動実行モードにしますか？")
 }
