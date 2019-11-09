@@ -7,12 +7,6 @@ interface Board {
 
     /** 指定された位置の石の色を返します。石が置かれていない場合は null を返します。 */
     operator fun get(point: Point): Color?
-
-    /**
-     * このリバーシ盤に指定された手を適用して得られるリバーシ盤を新たに生成して返します。
-     * @throws IllegalArgumentException 適用できない手が指定された場合
-     */
-    operator fun plus(move: Move): Board
 }
 
 // お勉強MEMO:
@@ -25,6 +19,30 @@ interface Board {
 // 今回は実験として、デフォルト実装を持つものはすべて拡張として実装してみる。
 // この方が、インタフェース内がすっきりし、実装（オーバーライド）すべきメンバが分かりやすくなる気がする。
 
+/** このリバーシ盤上の指定された色の石の数を返します。 */
+fun Board.count(color: Color): Int = Point.values().count { this[it] === color }
+
+/** このリバーシ盤を同等の内容のマップに変換して返します。 */
+private fun Board.toMap(): Map<Point, Color> =
+        Point.values().filter { this[it] !== null }.associateWith { this[it]!! }
+
+/**
+ * このリバーシ盤に指定された手を適用して得られるリバーシ盤を新たに生成して返します。
+ * @throws IllegalArgumentException 適用できない手が指定された場合
+ */
+operator fun Board.plus(move: Move): Board {
+    require(canApply(move)) { "この手は適用できません。\n$this$move" }
+    return if (move.isPass()) {
+        BoardImpl(this)
+    } else {
+        val nextMap: MutableMap<Point, Color> = toMap().toMutableMap()
+        val reversibles: Set<Point> = reversibles(move.color, move.point!!)
+        reversibles.forEach { nextMap[it] = move.color }
+        nextMap[move.point] = move.color
+        BoardImpl(nextMap)
+    }
+}
+
 /** このリバーシ盤の読み取り専用コピーを生成して返します。 */
 // お勉強MEMO:
 // 読み取り専用 ≠ 不変　ではあるものの、
@@ -34,13 +52,6 @@ fun Board.toBoard(): Board = boardOf(this)
 
 /** このリバーシ盤の変更可能コピーを生成して返します。 */
 fun Board.toMutableBoard(): MutableBoard = mutableBoardOf(this)
-
-/** このリバーシ盤上の指定された色の石の数を返します。 */
-fun Board.count(color: Color): Int = Point.values().count { this[it] === color }
-
-/** このリバーシ盤を同等の内容のマップに変換して返します。 */
-private fun Board.toMap(): Map<Point, Color> =
-        Point.values().filter { this[it] !== null }.associateWith { this[it]!! }
 
 /**
  * 変更可能なリバーシ盤を表します。
@@ -109,25 +120,16 @@ private open class BoardImpl : Board {
 
     override fun get(point: Point): Color? = map[point]
 
-    override operator fun plus(move: Move): Board {
-        require(canApply(move)) { "この手は適用できません。\n$this$move" }
-        return if (move.isPass()) {
-            BoardImpl(map)
-        } else {
-            val nextMap: MutableMap<Point, Color> = map.toMutableMap()
-            val reversibles: Set<Point> = reversibles(move.color, move.point!!)
-            reversibles.forEach { nextMap[it] = move.color }
-            nextMap[move.point] = move.color
-            BoardImpl(nextMap)
-        }
-    }
-
     override fun equals(other: Any?): Boolean = when (other) {
         is BoardImpl -> map == other.map
         is Board -> map == other.toMap()
         else -> false
     }
 
+    // お勉強MEMO:
+    // 本当は hashCode(), equals(Any?) も Board インタフェースのデフォルト実装なり拡張なりとして
+    // 全 [Board] 実装クラスで統一したい。じゃないと未知の [Board] 実装クラスとの間で不整合が生じる。
+    // これ、どうすれば良いんだろう？
     override fun hashCode(): Int = map.hashCode()
 
     override fun toString(): String {
