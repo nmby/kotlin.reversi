@@ -116,4 +116,8 @@ object Scanners {
             endInclusive = maxTimes,
             prompt = "対戦回数を ${minTimes}～${maxTimes} の範囲で指定してください > "
     )
+
+    /** 自動実行モードか否かを取得するためのスキャナー */
+    val automatic: ConsoleScanner<Boolean> = ConsoleScanner.yesOrNo(
+            question = "自動実行モードにしますか？")
 }

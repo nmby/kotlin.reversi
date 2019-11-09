@@ -36,7 +36,8 @@ class Match(
                 Scanners.player("プレーヤーB", false).get(),
                 Scanners.millisInGame.get(),
                 Scanners.millisInTurn.get(),
-                Scanners.times.get()
+                Scanners.times.get(),
+                Scanners.automatic.get()
         )
     }
 
