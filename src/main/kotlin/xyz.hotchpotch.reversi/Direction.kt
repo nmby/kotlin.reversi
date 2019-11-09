@@ -1,7 +1,7 @@
 package xyz.hotchpotch.reversi
 
 /**
- * リバーシ版上の方向を表す列挙型です。
+ * リバーシ盤上の方向を表す列挙型です。
  *
  * @property di 縦方向のベクトル
  * @property dj 横方向のベクトル

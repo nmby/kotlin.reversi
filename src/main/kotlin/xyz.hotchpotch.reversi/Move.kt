@@ -3,8 +3,8 @@ package xyz.hotchpotch.reversi
 /**
  * リバーシの手を表す不変クラスです。
  *
- * @property color 石の色
- * @property point 石を置く位置。パスの場合は null
+ * @param color 石の色
+ * @param point 石を置く位置。パスの場合は null
  */
 data class Move constructor(val color: Color, val point: Point?) {
 

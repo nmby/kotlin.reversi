@@ -6,6 +6,7 @@ package xyz.hotchpotch.reversi
 interface Board {
 
     /** 指定された位置の石の色を返します。石が置かれていない場合は null を返します。 */
+    // これは null を返す設計で妥当だと信じる。3値の列挙型を定義するのはなんか嫌い。
     operator fun get(point: Point): Color?
 }
 

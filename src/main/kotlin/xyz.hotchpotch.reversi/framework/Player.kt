@@ -3,10 +3,7 @@ package xyz.hotchpotch.reversi.framework
 import xyz.hotchpotch.reversi.Board
 import xyz.hotchpotch.reversi.Color
 import xyz.hotchpotch.reversi.Point
-import xyz.hotchpotch.reversi.players.ManualPlayer
-import xyz.hotchpotch.reversi.players.MonteCarloPlayer
-import xyz.hotchpotch.reversi.players.RandomPlayer
-import xyz.hotchpotch.reversi.players.SimplestPlayer
+import xyz.hotchpotch.reversi.players.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
 
@@ -25,6 +22,7 @@ interface Player {
         val aiPlayers: List<KClass<out Player>> = listOf(
                 SimplestPlayer::class,
                 RandomPlayer::class,
+                DepthFirstPlayer::class,
                 MonteCarloPlayer::class
         )
             // お勉強MEMO：
