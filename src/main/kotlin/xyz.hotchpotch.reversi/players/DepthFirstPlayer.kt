@@ -19,36 +19,20 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
     private lateinit var deadline: Instant
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
-        val availables: List<Point> = Point.values.filter { board.canPutAt(color, it) }
+        val puttables: List<Point> = board.puttables(color)
 
         // 選べる手が0や1の場合は、探索を行わずに直ちに決定する。
-        when (availables.size) {
+        when (puttables.size) {
             0 -> return null
-            1 -> return availables[0]
+            1 -> return puttables[0]
         }
 
         deadline = deadline(board, millisInGame)
-        val drawPoints: MutableList<Point> = mutableListOf()
 
-        try {
-            availables.forEach {
-
-                // この候補手を選んだ場合の勝敗を、深さ優先探索で調べる。
-                val winner: Color? = search(board + Move(color, it), color.reversed())
-
-                // 勝てることが分かった場合はこの手に決定する。
-                if (winner === color) return it
-
-                // 引き分けに持ち込めることが分かったら、記録しておく。
-                else if (winner === null) drawPoints.add(it)
-            }
-
-            // 引き分けに持ち込める手が見つかった場合はその手の中からランダムで、
-            // 引き分けに持ち込める手が見つからなかった場合はすべての手の中からランダムで選択する。
-            return if (drawPoints.isNotEmpty()) drawPoints.random() else availables.random()
-
+        return try {
+            search(board, color).first
         } catch (e: TimeUpException) {
-            return availables.random()
+            puttables.random()
         }
     }
 
@@ -59,29 +43,40 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
         return Instant.now().plusMillis(millisForThisTurn)
     }
 
-    /** ある手を選んだ場合の勝敗を深さ優先探索で調べ、今の段階での勝敗を返す。 */
-    private fun search(board: Board, currColor: Color): Color? {
-        if (!board.isGameOngoing()) return board.winner()
+    /**
+     * 今後の推移を深さ優先探索で調べ、選択すべき手と、それによって得られる勝敗を返す。
+     */
+    // お勉強MEMO:
+    // Color? を返す設計から Pair<Point?, Color?> を返す設計に変更。
+    // 変更前の方がパフォーマンスは良い。変更した理由は以下の2点。
+    //   - Pair と分割代入を実験的に使ってみたかったため
+    //   - choosePoint 内にあったロジック重複を排除するため
+    private fun search(board: Board, currColor: Color): Pair<Point?, Color?> {
+        if (!board.isGameOngoing()) return null to board.winner()
 
         // 時間切れの場合は探索を切り上げる。
         if (deadline < Instant.now()) throw TimeUpException()
 
-        val availables: List<Point> = Point.values.filter { board.canPutAt(currColor, it) }
+        val puttables: List<Point> = board.puttables(currColor)
 
         // パスの場合は次に委ねる。
-        if (availables.isEmpty()) return search(board, currColor.reversed())
+        if (puttables.isEmpty()) return null to search(board, currColor.reversed()).second
 
-        var canDraw = false
-        availables.forEach {
-            val winner: Color? = search(board + Move(currColor, it), currColor.reversed())
+        val drawPoints: MutableList<Point> = mutableListOf()
+        puttables.forEach {
+
+            // お勉強MEMO:
+            // 分割代入を半ば無理やり使ってみる。使いこなせば便利なのかも？？
+            val (_, winner) = search(board + Move(currColor, it), currColor.reversed())
 
             // 勝てる手が一つでもある場合はその手を選べばよいため、勝ち確定。
-            if (winner === currColor) return currColor
+            if (winner === currColor) return it to currColor
 
-            // 引き分けに持ち込める場合があるか否かを記録しておく。
-            else if (winner === null) canDraw = true
+            // 引き分けに持ち込める場合は、その手を記録しておく。
+            else if (winner === null) drawPoints.add(it)
         }
-        return if (canDraw) null else currColor.reversed()
+        return if (drawPoints.isNotEmpty()) drawPoints.random() to null
+        else puttables.random() to currColor.reversed()
     }
 }
 

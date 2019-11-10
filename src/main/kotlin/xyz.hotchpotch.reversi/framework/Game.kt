@@ -99,9 +99,11 @@ class Game(
                 } catch (e: Exception) {
                     val result: GameResult = GameResult.HeHasGoneMad(
                             violator = currTurn,
-                            cause = e,
                             board = board)
-                    if (!silent) println(result.announce)
+                    if (!silent) {
+                        println(result.announce)
+                        e.printStackTrace()
+                    }
                     return result
                 }
 
@@ -245,14 +247,12 @@ sealed class GameResult(val winner: Color?, val board: Board) {
      * プレーヤーの思考中に例外が発生したことにより決着が付いた場合のゲーム結果を表します。
      *
      * @param violator 例外を発生させたプレーヤーの石の色
-     * @param cause 発生した例外
      * @param board ゲーム終了時点のリバーシ盤
      */
     // TODO: もうちょっとマシな名前を考える
-    class HeHasGoneMad(violator: Color, cause: Exception, board: Board)
+    class HeHasGoneMad(violator: Color, board: Board)
         : GameResult(winner = violator.reversed(), board = board.toBoard()) {
 
-        override val announce: String = "$violator の思考中に例外が発生しました。 $violator の負けです。\n" +
-                cause.stackTrace.joinToString("\n") { toString() }
+        override val announce: String = "$violator の思考中に例外が発生しました。 $violator の負けです。"
     }
 }
