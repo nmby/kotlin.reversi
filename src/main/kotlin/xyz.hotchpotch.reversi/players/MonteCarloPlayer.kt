@@ -44,7 +44,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
 
             puttables.forEach {
                 val record: Record = records[it]!!
-                when (playOut1(mutableBoardOf(board + Move(color, it)), color.reversed())) {
+                when (playOut(mutableBoardOf(board + Move(color, it)), color.reversed())) {
                     color -> record.wins++
                     null -> record.draws++
                     else -> record.losses++
@@ -53,8 +53,8 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         }
 
         // 最も成績の良かった手を選択して返す。
-        // maxBy を使うと同成績の位置が複数あったときに結果が偏る。
-        // 特に一度もプレイアウトを行えなかった場合のことも考慮し、同率一位の中からランダムで選択することにする。
+        // max() を使うと同成績の位置が複数あったときに結果が偏る。
+        // 特に一度もプレイアウトを行えなかった場合のことも考慮し、同率一位の中からランダムに選択することとする。
         val bestRecord: Record = records.map { it.value }.max()!!
         return records.filter { bestRecord <= it.value }.keys.random()
     }
@@ -63,8 +63,8 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     private fun deadline(now: Instant, board: Board, millisInGame: Long): Instant {
         // このロジックは凝ろうと思えば色々と凝れるし、それで強くもなるが、
         // 面倒くさいので一旦これで
-        val remainingMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
-        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainingMyTurns) - MARGIN
+        val remainedMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
+        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainedMyTurns) - MARGIN
         return now.plusMillis(millisForThisTurn)
     }
 
@@ -76,11 +76,11 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
      * @return 勝者の色。引き分けの場合は null
      */
     // お勉強MEMO: せっかくなので末尾再帰（tailrec）ってやつを使ってみる。
-    private tailrec fun playOut1(board: MutableBoard, currTurn: Color): Color? {
+    private tailrec fun playOut(board: MutableBoard, currTurn: Color): Color? {
         if (!board.isGameOngoing()) return board.winner()
 
         val puttables = board.puttables(currTurn)
         if (puttables.isNotEmpty()) board.apply(Move(currTurn, puttables.random()))
-        return playOut1(board, currTurn.reversed())
+        return playOut(board, currTurn.reversed())
     }
 }

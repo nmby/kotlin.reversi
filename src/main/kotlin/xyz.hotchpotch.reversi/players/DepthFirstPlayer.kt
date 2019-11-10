@@ -38,8 +38,8 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
 
     /** 今回の手に費やせる時間を計算し、探索を切り上げるデッドラインを返す。 */
     private fun deadline(board: Board, millisInGame: Long): Instant {
-        val remainingMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
-        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainingMyTurns) - MARGIN
+        val remainedMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
+        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainedMyTurns) - MARGIN
         return Instant.now().plusMillis(millisForThisTurn)
     }
 

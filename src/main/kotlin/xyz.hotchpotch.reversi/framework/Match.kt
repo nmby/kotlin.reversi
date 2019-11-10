@@ -66,8 +66,8 @@ class Match(
             if (!silent) println("\n${it}回戦目（A=${colorA}, B=${colorA.reversed()}）\n")
 
             val gameResult: GameResult = Game(
-                    playerBlack = if (colorA == Color.BLACK) playerA else playerB,
-                    playerWhite = if (colorA == Color.BLACK) playerB else playerA,
+                    playerBlack = if (colorA === Color.BLACK) playerA else playerB,
+                    playerWhite = if (colorA === Color.BLACK) playerB else playerA,
                     millisInGame = millisInGame,
                     millisInTurn = millisInTurn,
                     automatic = true,

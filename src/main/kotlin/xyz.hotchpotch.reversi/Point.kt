@@ -19,7 +19,7 @@ private fun idxToOrdinal(i: Int, j: Int): Int = i * Point.WIDTH + j
 //   - 64個のメンバを列挙して実装するのはダサすぎる
 //   - HEIGHT, WIDTH で定義できるようにしたい
 // ということで、通常のクラスとして実装している。
-class Point private constructor(ordinal: Int) {
+class Point private constructor(private val ordinal: Int) : Comparable<Point> {
 
     companion object {
 
@@ -55,6 +55,11 @@ class Point private constructor(ordinal: Int) {
         operator fun get(pos: String): Point = map[pos] ?: throw IllegalArgumentException(pos)
     }
 
+    // お勉強MEMO:
+    // i, j, pos は ordinal から都度計算して返すようにカスタムゲッターを定義しても良いのだが、
+    // Point インスタンスはせいぜい64個しか生成されないため、
+    // 記憶域よりも都度演算の手間を省くことを優先させることにした。
+
     /** 縦座標 */
     val i: Int = ordinal / WIDTH
 
@@ -73,4 +78,6 @@ class Point private constructor(ordinal: Int) {
     }
 
     override fun toString(): String = pos
+
+    override fun compareTo(other: Point): Int = ordinal.compareTo(other.ordinal)
 }
