@@ -45,6 +45,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         val totalWins: MutableMap<Point, Long> = mutableMapOf()
 
         // 時間がある限り、思考（試行）を繰り返す。
+        // TODO: 制限時間オーバーになることが多いため、ロジックを変更する
         val deadline: Instant = deadline(now, board, millisInGame)
         while (Instant.now() < deadline) {
 
