@@ -3,17 +3,12 @@ package xyz.hotchpotch.reversi.players
 import xyz.hotchpotch.reversi.*
 import xyz.hotchpotch.reversi.framework.Player
 import xyz.hotchpotch.reversi.framework.PlayerFactory
+import xyz.hotchpotch.reversi.framework.Record
 import java.lang.Long.min
 import java.time.Instant
-import java.util.stream.Stream
-
-/** 1サイクル当たりの試行（プレイアウト）回数 */
-// 残り時間や処理性能とかに応じてここを可変にするとより良くなるんだろうけど
-// 面倒なので今回はこれで。
-private const val TIMES: Int = 16
 
 /** 今回の手に費やせる時間を計算する際の余裕代 */
-private const val MARGIN: Long = 50
+private const val MARGIN: Long = 20
 
 /**
  * モンテカルロシミュレーションで最も勝率が高い手を選択するプレーヤーです。
@@ -33,7 +28,6 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
      * 最も勝率の高い手を選択して返します。
      */
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
-        val now: Instant = Instant.now()
 
         // 石を置ける位置が0（パス）または1の場合は、直ちに手が決まる。
         val puttables = board.puttables(color)
@@ -42,24 +36,27 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
             1 -> return puttables[0]
         }
 
-        val totalWins: MutableMap<Point, Long> = mutableMapOf()
+        val records: Map<Point, Record> = puttables.associateWith { Record() }
 
         // 時間がある限り、思考（試行）を繰り返す。
-        // TODO: 制限時間オーバーになることが多いため、ロジックを変更する
-        val deadline: Instant = deadline(now, board, millisInGame)
+        val deadline: Instant = deadline(Instant.now(), board, millisInGame)
         while (Instant.now() < deadline) {
 
-            // 石を置ける位置それぞれについてプレイアウトをN回行い、その成績を積算する。
-            val wins: Map<Point, Long> = puttables.associateWith { playOutN(board, it) }
-            puttables.forEach { totalWins[it] = (totalWins[it] ?: 0) + (wins[it] ?: 0) }
+            puttables.forEach {
+                val record: Record = records[it]!!
+                when (playOut1(mutableBoardOf(board + Move(color, it)), color.reversed())) {
+                    color -> record.wins++
+                    null -> record.draws++
+                    else -> record.losses++
+                }
+            }
         }
 
-        // 最も勝ち数が多かった手を選択して返す。
-        // maxBy を使うと同成績の位置が複数あったときに結果が偏る気がするけど、まぁいいや
-        return if (totalWins.isNotEmpty()) totalWins.maxBy { it.value }!!.key
-
-        // 時間がなく一度も施行できなかった場合はランダムに選ぶ。
-        else puttables.random()
+        // 最も成績の良かった手を選択して返す。
+        // maxBy を使うと同成績の位置が複数あったときに結果が偏る。
+        // 特に一度もプレイアウトを行えなかった場合のことも考慮し、同率一位の中からランダムで選択することにする。
+        val bestRecord: Record = records.map { it.value }.max()!!
+        return records.filter { bestRecord <= it.value }.keys.random()
     }
 
     /** 今回の手に費やせる時間を計算し、最後の施行を始めるデッドラインを返す。 */
@@ -69,29 +66,6 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         val remainingMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
         val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainingMyTurns) - MARGIN
         return now.plusMillis(millisForThisTurn)
-    }
-
-    /**
-     * 現在のターンで自分が選択できる手の一つについて、プレイアウトを規定回数実施し、
-     * 自身の色が勝利した回数を返します。
-     *
-     * @param currBoard 現在のリバーシ盤
-     * @param candidate 現在のターンで選択できる位置のうちの一つ
-     * @param times プレイアウトを行う回数
-     */
-    // 本当は勝利回数だけじゃなくて引き分けの回数も考慮すると精度が上がるが、今回はまぁ良しとする。
-    private fun playOutN(currBoard: Board, candidate: Point, times: Int = TIMES): Long {
-        assert(currBoard.canPutAt(color, candidate))
-
-        val nextBoard: Board = currBoard + Move(color, candidate)
-
-        // ここで並列化するのが一番良いんじゃないかなー・・・　というのは根拠のない想定
-        return Stream.generate { nextBoard.toMutableBoard() }
-                .parallel()
-                .limit(times.toLong())
-                .map { playOut1(it, color.reversed()) }
-                .filter { it === color }
-                .count()
     }
 
     /**
