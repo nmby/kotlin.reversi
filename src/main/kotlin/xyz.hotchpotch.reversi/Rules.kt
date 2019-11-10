@@ -23,6 +23,14 @@ fun Board.canPutAt(color: Color, point: Point): Boolean = this[point] === null
 fun Board.canApply(move: Move): Boolean = isGameOngoing()
         && if (move.isPass()) !canPut(move.color) else canPutAt(move.color, move.point!!)
 
+/** このリバーシ盤上の指定された色の石を置ける位置が格納されたリストを返します。 */
+// 「プッタブル」っていうと金融デリバティブ商品みたいだけど。
+// お勉強MEMO:
+// こういうAPIの戻り値型をどうするか悩む。この場合は本質的に Set であるべきだが、
+// 使う側は List の方が便利なんだろうな。今回は List にしてみる。
+fun Board.puttables(color: Color): List<Point> =
+        Point.values.filter { canPutAt(color, it) }
+
 /**
  * このリバーシ盤の指定された位置に指定された色の石を置いた場合に
  * ひっくり返せる石の位置が格納されたセット（ひっくり返せる石がない場合は空のセット）を返します。

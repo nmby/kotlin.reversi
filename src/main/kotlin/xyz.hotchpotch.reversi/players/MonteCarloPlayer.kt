@@ -35,13 +35,11 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
         val now: Instant = Instant.now()
 
-        // 石を置ける位置
-        val availables = Point.values.filter { board.canPutAt(color, it) }
-
         // 石を置ける位置が0（パス）または1の場合は、直ちに手が決まる。
-        when (availables.size) {
+        val puttables = board.puttables(color)
+        when (puttables.size) {
             0 -> return null
-            1 -> return availables[0]
+            1 -> return puttables[0]
         }
 
         val totalWins: MutableMap<Point, Long> = mutableMapOf()
@@ -51,8 +49,8 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         while (Instant.now() < deadline) {
 
             // 石を置ける位置それぞれについてプレイアウトをN回行い、その成績を積算する。
-            val wins: Map<Point, Long> = availables.associateWith { playOutN(board, it) }
-            availables.forEach { totalWins[it] = (totalWins[it] ?: 0) + (wins[it] ?: 0) }
+            val wins: Map<Point, Long> = puttables.associateWith { playOutN(board, it) }
+            puttables.forEach { totalWins[it] = (totalWins[it] ?: 0) + (wins[it] ?: 0) }
         }
 
         // 最も勝ち数が多かった手を選択して返す。
@@ -60,7 +58,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         return if (totalWins.isNotEmpty()) totalWins.maxBy { it.value }!!.key
 
         // 時間がなく一度も施行できなかった場合はランダムに選ぶ。
-        else availables.random()
+        else puttables.random()
     }
 
     /** 今回の手に費やせる時間を計算し、最後の施行を始めるデッドラインを返す。 */
@@ -106,8 +104,8 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     private tailrec fun playOut1(board: MutableBoard, currTurn: Color): Color? {
         if (!board.isGameOngoing()) return board.winner()
 
-        val availables = Point.values.filter { board.canPutAt(currTurn, it) }
-        if (availables.isNotEmpty()) board.apply(Move(currTurn, availables.random()))
+        val puttables = board.puttables(currTurn)
+        if (puttables.isNotEmpty()) board.apply(Move(currTurn, puttables.random()))
         return playOut1(board, currTurn.reversed())
     }
 }
