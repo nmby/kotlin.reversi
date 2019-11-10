@@ -13,7 +13,7 @@ data class Record(var wins: Int = 0, var draws: Int = 0, var losses: Int = 0) : 
         get() = wins + losses + draws
 
     /** 勝ちの割合 */
-    val winsRatio: Double
+    val winRatio: Double
         get() = wins.toDouble() / totalPlays
 
     /** 引き分けの割合 */
@@ -21,7 +21,7 @@ data class Record(var wins: Int = 0, var draws: Int = 0, var losses: Int = 0) : 
         get() = draws.toDouble() / totalPlays
 
     /** 負けの割合 */
-    val lossesRatio: Double
+    val lossRatio: Double
         get() = losses.toDouble() / totalPlays
 
     /** 相手の対戦成績（つまりこの対戦成績の勝ち数と負け数を入れ替えたもの）を生成して返します。 */
@@ -40,13 +40,13 @@ data class Record(var wins: Int = 0, var draws: Int = 0, var losses: Int = 0) : 
     override fun compareTo(other: Record): Int {
         // 成績が良い方を「大きい」と評価する。
         return when {
-            winsRatio != other.winsRatio -> winsRatio.compareTo(other.winsRatio)
-            lossesRatio != other.lossesRatio -> -lossesRatio.compareTo(other.lossesRatio)
+            winRatio != other.winRatio -> winRatio.compareTo(other.winRatio)
+            lossRatio != other.lossRatio -> -lossRatio.compareTo(other.lossRatio)
             else -> 0
         }
     }
 
     override fun toString(): String =
-            "勝ち：${wins}(%.1f%), 引き分け：${draws}(%.1f%), 負け：${losses}(%.1f%)"
-                    .format(winsRatio, drawRatio, lossesRatio)
+            "勝ち：${wins}(%.1f%%), 引き分け：${draws}(%.1f%%), 負け：${losses}(%.1f%%)"
+                    .format(winRatio, drawRatio, lossRatio)
 }

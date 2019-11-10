@@ -110,9 +110,9 @@ class League(
                 }
 
                 str.append("\t%d(%.1f%%) / %d(%.1f%%) / %d(%.1f%%)\n".format(
-                        xTotalRecord.wins, xTotalRecord.winsRatio * 100,
+                        xTotalRecord.wins, xTotalRecord.winRatio * 100,
                         xTotalRecord.draws, xTotalRecord.drawRatio * 100,
-                        xTotalRecord.losses, xTotalRecord.lossesRatio * 100))
+                        xTotalRecord.losses, xTotalRecord.lossRatio * 100))
                 totalRecords[playerX] = xTotalRecord
             }
             print(str)

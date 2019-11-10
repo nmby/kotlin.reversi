@@ -63,8 +63,8 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     private fun deadline(now: Instant, board: Board, millisInGame: Long): Instant {
         // このロジックは凝ろうと思えば色々と凝れるし、それで強くもなるが、
         // 面倒くさいので一旦これで
-        val remainingMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
-        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainingMyTurns) - MARGIN
+        val remainedMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
+        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainedMyTurns) - MARGIN
         return now.plusMillis(millisForThisTurn)
     }
 
