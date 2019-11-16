@@ -12,7 +12,7 @@ interface Board {
 
 // お勉強MEMO:
 // インタフェースのメンバ関数でデフォルト実装を持つものについて、
-// インタフェース定義と同一ファイル内で拡張関数として実装した方が良いのはどんな場合か？？
+// 拡張関数として実装した方が良いのはどんな場合か？？
 //   - private にしたいものは拡張として実装（これは確定）
 //   - オーバーライドを期待しないものは拡張として実装
 //   - オーバーライドを期待するものはインタフェースのメンバとして実装
@@ -138,9 +138,9 @@ private open class BoardImpl : Board {
         (0 until Point.WIDTH).forEach { str.append('a' + it).append(' ') }
         str.appendln()
 
-        (0 until Point.HEIGHT).forEach { i ->
+        for (i in 0 until Point.HEIGHT) {
             str.append(i + 1).append(' ')
-            (0 until Point.WIDTH).forEach { j ->
+            for (j in 0 until Point.WIDTH) {
                 str.append(get(Point[i, j]) ?: "・")
             }
             str.appendln()
