@@ -47,8 +47,9 @@ class DepthFirstPlayer(
         deadline = deadline(board, millisInGame)
 
         return try {
-            // 深さ優先探索で手を読み切れた場合。
             val result: Pair<Point?, Color?> = search(board, color)
+
+            // 深さ優先探索で手を読み切れた場合。
             if (verbose) print(when (result.second) {
                 color -> "W"
                 null -> "D"

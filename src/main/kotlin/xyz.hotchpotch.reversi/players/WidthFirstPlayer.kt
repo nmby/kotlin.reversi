@@ -85,7 +85,7 @@ class WidthFirstPlayer(
 
         /** このノードのcolorから見たスコア */
         // お勉強MEMO: observableを使ってみる。
-        var score: Double by Delegates.observable(evaluator.invoke(currBoard, color)) { _, old, new ->
+        var score: Double by Delegates.observable(evaluator.invoke(currBoard, color)) { _, _, _ ->
             // このノードのスコアが更新された場合は、親ノードのスコアも更新する。
             updateParentBest()
         }
@@ -147,7 +147,7 @@ private object Evaluators {
 
     /**
      * [evaluateBoard1] と [evaluateBoard2] の混合でスコアを計算する評価関数です。
-     * ゲーム初期は [evaluateBoard2] に、
+     * ゲーム序盤は [evaluateBoard2] に、
      * ゲーム終盤は [evaluateBoard1] にウェイトを置いてスコアを算出します。
      */
     fun evaluateBoard3(board: Board, color: Color): Double {
@@ -166,7 +166,7 @@ private object Evaluators {
         assert(Point.HEIGHT == 8 && Point.WIDTH == 8)
 
         val weights: Array<Array<Int>> = arrayOf(
-                // この内容も根拠なし
+                // この内容も根拠なし。適当に置いた数字。
                 arrayOf(10, -3, 7, 5, 5, 7, -3, 10),
                 arrayOf(-3, -5, 3, 2, 2, 3, -5, -3),
                 arrayOf(7, 3, 8, 5, 5, 8, 3, 7),
