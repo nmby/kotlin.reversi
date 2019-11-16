@@ -14,8 +14,13 @@ private const val MARGIN: Long = 20
  *
  * @param color このプレーヤーの石の色
  * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
+ * @param verbose 思考結果を標準出力に表示する場合は true
  */
-class DepthFirstPlayer(private val color: Color, private val millisAtTurn: Long) : Player {
+class DepthFirstPlayer(
+        private val color: Color,
+        private val millisAtTurn: Long,
+        private val verbose: Boolean = false
+) : Player {
 
     companion object : PlayerFactory {
         override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
@@ -29,15 +34,31 @@ class DepthFirstPlayer(private val color: Color, private val millisAtTurn: Long)
 
         // 選べる手が0や1の場合は、探索を行わずに直ちに決定する。
         when (puttables.size) {
-            0 -> return null
-            1 -> return puttables.first()
+            0 -> {
+                if (verbose) print("!")
+                return null
+            }
+            1 -> {
+                if (verbose) print("!")
+                return puttables.first()
+            }
         }
 
         deadline = deadline(board, millisInGame)
 
         return try {
-            search(board, color).first
+            // 深さ優先探索で手を読み切れた場合。
+            val result: Pair<Point?, Color?> = search(board, color)
+            if (verbose) print(when (result.second) {
+                color -> "W"
+                null -> "D"
+                else -> "L"
+            })
+            result.first
+
         } catch (e: TimeUpException) {
+            // 探索中に時間切れになった場合。
+            if (verbose) print("-")
             puttables.random()
         }
     }

@@ -5,7 +5,9 @@ import xyz.hotchpotch.reversi.framework.Player
 import xyz.hotchpotch.reversi.framework.PlayerFactory
 import xyz.hotchpotch.reversi.util.ConsoleScanner
 
-private val posRegex: Regex = "[a-%c][1-%d]".format('a' + Point.WIDTH - 1, Point.HEIGHT).toRegex()
+private val posRegex: Regex = "[a-%c][1-%d]"
+        .format('a' + Point.WIDTH - 1, Point.HEIGHT)
+        .toRegex()
 
 /**
  * 標準入力から手動で手を入力するためのプレーヤーです。

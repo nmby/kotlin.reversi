@@ -30,9 +30,7 @@ class Point private constructor(private val ordinal: Int) : Comparable<Point> {
         const val WIDTH = 8
 
         /** 全ての [Point] インスタンスを保持するリスト */
-        val values: List<Point> = (0 until HEIGHT * WIDTH)
-                .map { Point(it) }
-                .toList()
+        val values: List<Point> = (0 until HEIGHT * WIDTH).map { Point(it) }
             get() = field.toList()
 
         /** 全ての [Point] インスタンスを保持するマップ */
@@ -55,10 +53,11 @@ class Point private constructor(private val ordinal: Int) : Comparable<Point> {
         operator fun get(pos: String): Point = map[pos] ?: throw IllegalArgumentException(pos)
     }
 
-    // お勉強MEMO:
+    // 実装MEMO:
     // i, j, pos は ordinal から都度計算して返すようにカスタムゲッターを定義しても良いのだが、
     // Point インスタンスはせいぜい64個しか生成されないため、
     // 記憶域よりも都度演算の手間を省くことを優先させることにした。
+    // めっちゃ利用されるはずだし。
 
     /** 縦座標 */
     val i: Int = ordinal / WIDTH
