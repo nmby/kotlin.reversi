@@ -107,7 +107,7 @@ class WidthFirstPlayer(
             }
         }
 
-        /** 一手先の状態を探索して自身のスコアを更新し、探索した一手先のノードたちを返します。 */
+        /** 一手先の状態を探索して返します。 */
         fun search(): Set<Node> {
             val puttables: Set<Point> = currBoard.puttables(currColor)
 
