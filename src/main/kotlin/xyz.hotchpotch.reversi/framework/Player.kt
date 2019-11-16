@@ -23,6 +23,7 @@ interface Player {
                 SimplestPlayer::class,
                 RandomPlayer::class,
                 DepthFirstPlayer::class,
+                WidthFirstPlayer::class,
                 MonteCarloPlayer::class
         )
             // お勉強MEMO：
