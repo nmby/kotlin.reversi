@@ -13,6 +13,7 @@ import xyz.hotchpotch.reversi.puttables
  * @param color このプレーヤーの石の色
  */
 class RandomPlayer(private val color: Color) : Player {
+
     companion object : PlayerFactory {
         override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
                 RandomPlayer(color)

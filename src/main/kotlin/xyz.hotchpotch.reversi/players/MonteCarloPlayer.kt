@@ -46,16 +46,16 @@ class MonteCarloPlayer(private val color: Color, private val millisAtTurn: Long)
 
             puttables.forEach {
                 val record: Record = records[it]
-                        // お勉強MEMO:
-                        // こういうMapからの取得について、どうするのが良いのだろう。
-                        // 「!!」をつけるのも下記のようにAssertionErrorを投げるのも野暮ったい。
-                        // records[it]がnotnullであることをコンパイラに伝える一番良い方法は？
+                // お勉強MEMO:
+                // こういうMapからの取得結果に対するnull否定について、どうするのが良いのだろう。
+                // 「!!」をつけるのも、下記のようにAssertionErrorを投げるのも、野暮ったい。
+                // records[it]がnotnullであることをコンパイラに伝える一番良い方法は？
                         ?: throw AssertionError("nullはあり得ない")
 
                 when (playOut(mutableBoardOf(board + Move(color, it)), color.reversed())) {
                     color -> record.wins++
-                    null -> record.draws++
-                    else -> record.losses++
+                    color.reversed() -> record.losses++
+                    else -> record.draws++
                 }
             }
         }

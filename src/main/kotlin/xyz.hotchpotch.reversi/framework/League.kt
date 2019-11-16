@@ -67,7 +67,7 @@ class League(
                         silent = true
                 ).play()
 
-                val xRecord: Record = result.record(playerX)!!
+                val xRecord: Record = result.record(playerX)
 
                 if (!silent) {
                     println("${'A' + i}の勝ち：${xRecord.wins}, " +
@@ -110,7 +110,7 @@ class LeagueResult(
                     str.append("\t(-/-/-)")
                 } else {
                     val playerY: KClass<out Player> = players[j]
-                    val xRecord: Record = records[playerX to playerY]!!
+                    val xRecord: Record = records[playerX to playerY] ?: throw AssertionError()
                     str.append("\t(%d/%d/%d)".format(xRecord.wins, xRecord.draws, xRecord.losses))
                     xTotalRecord.add(xRecord)
                 }

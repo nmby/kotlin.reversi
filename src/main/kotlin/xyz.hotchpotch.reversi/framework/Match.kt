@@ -110,7 +110,8 @@ class MatchResult(
 
     private val records: Map<KClass<out Player>, Record> = mapOf(blackRecord, whiteRecord)
 
-    fun record(player: KClass<out Player>): Record? = records[player]
+    fun record(player: KClass<out Player>): Record = records[player]
+            ?: throw IllegalArgumentException("このプレーヤーは参加していません: " + player.qualifiedName)
 
     override val announce: String = with(blackRecord.second) {
         "\n総合成績：\n\tAの勝ち：${wins}, 引き分け：${draws}, Bの勝ち：${losses}\n" +

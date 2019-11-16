@@ -30,11 +30,16 @@ class WidthFirstPlayer(
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
         val root = Node(null, null, board, color)
+
+        // 探索すべきノードを保持するキュー。ここに格納されているノードのネクストノードを順に探索する。
+        // 現在の手番を表すルートノードから始めて、一手先のすべてを探索し終えたら二手先を、
+        // 二手先をすべて探索し終えたら三手先を、・・・　というように幅優先探索を行う。
         val nodesInProcess: Queue<Node> = ArrayDeque()
         nodesInProcess.add(root)
 
         val deadline: Instant = deadline(board, millisInGame)
         do {
+            // キューの先頭に格納されているノードの次のノードを探索し、それらをキューの末尾に追加する。
             val currNode: Node = nodesInProcess.remove()
             nodesInProcess.addAll(currNode.search())
         } while (nodesInProcess.isNotEmpty() && Instant.now() < deadline)
@@ -69,14 +74,15 @@ class WidthFirstPlayer(
         // そして探索の最先端ノードのリバーシ盤を評価関数で評価し、
         // ミニマックス法で直近ノードのスコアを算出して手を決める。
         //
-        // 本来、コストのかかるリバーシ盤の評価処理はリーフノード（最先端ノード）のみで実施べきだが、
+        // 本来、コストのかかるリバーシ盤の評価処理は、
+        // 時間切れで探索を終了した時点のリーフノード（最先端ノード）のみで実施べきだが、
         // 以下の理由から、途中ノードを含む全ノードで評価計算を行ってその都度親ノードに結果を遡及させる
         // という方法を採用した。
-        //   1.最後に一度に評価処理を行って時間切れになるリスクを減らすため
-        //   2.ソース簡略化のため
+        //   1.最後にまとめて評価処理を行うことによる時間切れリスクを減らすため
+        //   2.ソースコード簡略化のため
         //   3.お勉強としてobservableを使ってみたかったため
 
-        /** currColorにとって最も良い一手先の状態 */
+        /** 子ノードのうち、currColorから見て最も良いノード */
         // お勉強MEMO: observableを使ってみる。
         var bestChild: Node? by Delegates.observable<Node?>(null) { _, _, new ->
             // bestChildが更新された場合は、scoreも更新する。
@@ -94,7 +100,9 @@ class WidthFirstPlayer(
             // observableは初期値設定時は発火しないため、 initブロックでの処理が必要。
             // もうちょっとの工夫でもうちょっとスマートになる気がするんだけどなぁ・・・
             if (parent !== null) {
+                // 親ノードの bestChild が未設定の場合は、このノードを設定する。
                 if (parent.bestChild === null) parent.bestChild = this
+                // 既に bestChild が設定済みの場合は、新たに生成されたこのノードも踏まえて再評価を行う。
                 else updateParentBest()
             }
         }
@@ -102,6 +110,7 @@ class WidthFirstPlayer(
         private fun updateParentBest() {
             if (parent === null) return
             when {
+                // ミニマックス法
                 parent.currColor === color && parent.score < score -> parent.bestChild = this
                 parent.currColor !== color && score < parent.score -> parent.bestChild = this
             }
