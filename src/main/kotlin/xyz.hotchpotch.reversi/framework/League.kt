@@ -98,12 +98,12 @@ class LeagueResult(
         str.appendln()
         str.appendln("総合成績（勝ち/分け/負け）：")
         str.append((0..players.lastIndex).joinToString("") { "\t[ 対 ${'A' + it} ]" })
-        str.appendln("\t[ TOTAL ]")
+        str.append("\t[ TOTAL ]")
 
         for (i in 0..players.lastIndex) {
             val playerX: KClass<out Player> = players[i]
             val xTotalRecord = Record()
-            str.append("[${'A' + i}]")
+            str.append("\n[${'A' + i}]")
 
             for (j in 0..players.lastIndex) {
                 if (i == j) {
