@@ -95,6 +95,7 @@ private val initMap: Map<Point, Color> = mapOf(
 /**
  * 読み取り専用リバーシ盤の標準的な実装です。
  */
+// TODO: そのうちビット演算ベースの高パフォーマンス実装に切り替える
 private open class BoardImpl : Board {
 
     /** このリバーシ盤の石の配置を保持するマップ */

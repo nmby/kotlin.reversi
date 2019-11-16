@@ -9,6 +9,12 @@ import java.time.Instant
 /** 今回の手に費やせる時間を計算する際の余裕代 */
 private const val MARGIN: Long = 20
 
+/**
+ * 深さ優先探索による必勝手を選択するプレーヤーです。
+ *
+ * @param color このプレーヤーの石の色
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
+ */
 class DepthFirstPlayer(private val color: Color, private val millisAtTurn: Long) : Player {
 
     companion object : PlayerFactory {
