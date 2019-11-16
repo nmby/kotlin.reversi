@@ -144,8 +144,8 @@ private object Evaluators {
 
     /**
      * [evaluateBoard1] と [evaluateBoard2] の混合でスコアを計算する評価関数です。
-     * ゲーム初期は [evaluateBoard1] に、
-     * ゲーム終盤は [evaluateBoard2] にウェイトを置いてスコアを算出します。
+     * ゲーム初期は [evaluateBoard2] に、
+     * ゲーム終盤は [evaluateBoard1] にウェイトを置いてスコアを算出します。
      */
     fun evaluateBoard3(board: Board, color: Color): Double {
         val stones: Int = Point.values.count { board[it] !== null }
