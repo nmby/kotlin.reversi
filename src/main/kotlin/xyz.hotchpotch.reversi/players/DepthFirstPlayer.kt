@@ -9,11 +9,11 @@ import java.time.Instant
 /** 今回の手に費やせる時間を計算する際の余裕代 */
 private const val MARGIN: Long = 20
 
-class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long) : Player {
+class DepthFirstPlayer(private val color: Color, private val millisAtTurn: Long) : Player {
 
     companion object : PlayerFactory {
-        override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
-                DepthFirstPlayer(color, millisInTurn)
+        override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
+                DepthFirstPlayer(color, millisAtTurn)
     }
 
     private lateinit var deadline: Instant
@@ -39,7 +39,7 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
     /** 今回の手に費やせる時間を計算し、探索を切り上げるデッドラインを返す。 */
     private fun deadline(board: Board, millisInGame: Long): Instant {
         val remainedMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
-        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainedMyTurns) - MARGIN
+        val millisForThisTurn: Long = min(millisAtTurn, millisInGame / remainedMyTurns) - MARGIN
         return Instant.now().plusMillis(millisForThisTurn)
     }
 

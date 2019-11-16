@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
  * @param playerBlack 黒プレーヤーのクラス
  * @param playerWhite 白プレーヤーのクラス
  * @param millisInGame ゲーム内の各プレーヤーの持ち時間（ミリ秒）
- * @param millisInTurn 一手当たりの制限時間（ミリ秒）
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  * @param automatic 一手ごとに対話的に手を進める「対話モード」ではなく
  *                  自動でゲーム完了まで進める「自動モード」の場合は true
  * @param silent 標準出力への出力なしで進行させる場合は true。
@@ -21,7 +21,7 @@ class Game(
         private val playerBlack: KClass<out Player>,
         private val playerWhite: KClass<out Player>,
         private val millisInGame: Long,
-        private val millisInTurn: Long,
+        private val millisAtTurn: Long,
         private val automatic: Boolean = false,
         private val silent: Boolean = false
 ) : Playable<GameResult> {
@@ -34,7 +34,7 @@ class Game(
                 Scanners.player("${Color.BLACK} のプレーヤー", true).get(),
                 Scanners.player("${Color.WHITE} のプレーヤー", true).get(),
                 Scanners.millisInGame.get(),
-                Scanners.millisInTurn.get(),
+                Scanners.millisAtTurn.get(),
                 Scanners.automatic.get()
         )
     }
@@ -52,14 +52,14 @@ class Game(
     /** 黒プレーヤーのプロパティ */
     private val blackProps = object : Props {
         override val player =
-                createPlayer(playerBlack, Color.BLACK, millisInGame, millisInTurn)
+                createPlayer(playerBlack, Color.BLACK, millisInGame, millisAtTurn)
         override var remainedMillis = millisInGame
     }
 
     /** 白プレーヤーのプロパティ */
     private val whiteProps = object : Props {
         override val player =
-                createPlayer(playerWhite, Color.WHITE, millisInGame, millisInTurn)
+                createPlayer(playerWhite, Color.WHITE, millisInGame, millisAtTurn)
         override var remainedMillis = millisInGame
     }
 
@@ -75,7 +75,7 @@ class Game(
             println("\t${Color.BLACK} : ${playerBlack.qualifiedName}\n" +
                     "\t${Color.WHITE} : ${playerWhite.qualifiedName}\n" +
                     "\tゲーム内の総持ち時間（ミリ秒） : $millisInGame\n" +
-                    "\t一手当たりの制限時間（ミリ秒） : $millisInTurn\n" +
+                    "\t一手当たりの制限時間（ミリ秒） : $millisAtTurn\n" +
                     "> ")
             if (automatic) println() else readLine()
         }
@@ -116,11 +116,11 @@ class Game(
                 }
 
                 // 一手当たりの制限時間を超過した場合
-                if (millisInTurn < passedMillis) {
-                    val result: GameResult = GameResult.OverTheTimeLimitInTurn(
+                if (millisAtTurn < passedMillis) {
+                    val result: GameResult = GameResult.OverTheTimeLimitAtTurn(
                             violator = currTurn,
-                            limit = millisInTurn,
-                            exceeded = passedMillis - millisInTurn,
+                            limit = millisAtTurn,
+                            exceeded = passedMillis - millisAtTurn,
                             board = board
                     )
                     if (!silent) println(result.announce)
@@ -236,7 +236,7 @@ sealed class GameResult(val winner: Color?, val board: Board) {
      * @param exceeded 超過した時間（ミリ秒）
      * @param board ゲーム終了時点のリバーシ盤
      */
-    class OverTheTimeLimitInTurn(violator: Color, limit: Long, exceeded: Long, board: Board)
+    class OverTheTimeLimitAtTurn(violator: Color, limit: Long, exceeded: Long, board: Board)
         : GameResult(winner = violator.reversed(), board = board.toBoard()) {
 
         override val announce: String =

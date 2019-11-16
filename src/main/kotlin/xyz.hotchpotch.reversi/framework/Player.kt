@@ -72,10 +72,10 @@ interface PlayerFactory {
      *
      * @param color このプレーヤーの石の色
      * @param millisInGame ゲーム内の持ち時間（ミリ秒）
-     * @param millisInTurn 一手当たりの持ち時間（ミリ秒）
+     * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
      * @return プレーヤーインスタンス
      */
-    fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player
+    fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player
 }
 
 /**
@@ -84,7 +84,7 @@ interface PlayerFactory {
  * @param playerClass インスタンス化する [Player] 実装クラス
  * @param color このプレーヤーの石の色
  * @param millisInGame ゲーム内の持ち時間（ミリ秒）
- * @param millisInTurn 一手当たりの持ち時間（ミリ秒）
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  * @return 生成されたプレーヤーインスタンス
  * @throws IllegalArgumentException 指定された [Player] 実装クラスのコンパニオンオブジェクトが
  *                                  [PlayerFactory] を実装しない場合
@@ -93,11 +93,11 @@ fun createPlayer(
         playerClass: KClass<out Player>,
         color: Color,
         millisInGame: Long,
-        millisInTurn: Long
+        millisAtTurn: Long
 ): Player {
 
     val factory: Any? = playerClass.companionObjectInstance
-    return if (factory is PlayerFactory) factory.create(color, millisInGame, millisInTurn)
+    return if (factory is PlayerFactory) factory.create(color, millisInGame, millisAtTurn)
     else throw IllegalArgumentException(
             "Player実装クラスはPlayerFactoryインタフェースを実装したコンパニオンオブジェクトを持つ必要があります。")
 }

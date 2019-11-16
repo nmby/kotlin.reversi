@@ -97,14 +97,14 @@ object Scanners {
             prompt = "ゲーム内の持ち時間（ミリ秒）を ${minInGame}～${maxInGame} の範囲で指定してください > "
     )
 
-    private const val minInTurn: Long = 50
-    private const val maxInTurn: Long = 1000 * 60 * 10
+    private const val minAtTurn: Long = 50
+    private const val maxAtTurn: Long = 1000 * 60 * 10
 
-    /** 一手当たりの持ち時間（ミリ秒）を取得するためのスキャナー */
-    val millisInTurn: ConsoleScanner<Long> = ConsoleScanner.forLong(
-            startInclusive = minInTurn,
-            endInclusive = maxInTurn,
-            prompt = "一手ごとの制限時間（ミリ秒）を ${minInTurn}～${maxInTurn} の範囲で指定してください > "
+    /** 一手当たりの制限時間（ミリ秒）を取得するためのスキャナー */
+    val millisAtTurn: ConsoleScanner<Long> = ConsoleScanner.forLong(
+            startInclusive = minAtTurn,
+            endInclusive = maxAtTurn,
+            prompt = "一手ごとの制限時間（ミリ秒）を ${minAtTurn}～${maxAtTurn} の範囲で指定してください > "
     )
 
     private const val minTimes: Int = 2

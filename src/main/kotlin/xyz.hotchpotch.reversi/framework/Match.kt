@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
  * @param playerA プレーヤーAのクラス
  * @param playerB プレーヤーBのクラス
  * @param millisInGame ゲーム内の各プレーヤーの持ち時間（ミリ秒）
- * @param millisInTurn 一手当たりの制限時間（ミリ秒）
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  * @param times 対戦回数
  * @param automatic 一ゲームごとに対話的に手を進める「対話モード」ではなく
  *                  自動でマッチ終了まで進める「自動モード」の場合は true
@@ -21,7 +21,7 @@ class Match(
         private val playerA: KClass<out Player>,
         private val playerB: KClass<out Player>,
         private val millisInGame: Long,
-        private val millisInTurn: Long,
+        private val millisAtTurn: Long,
         private val times: Int,
         private val automatic: Boolean = false,
         private val silent: Boolean = false
@@ -35,7 +35,7 @@ class Match(
                 Scanners.player("プレーヤーA", false).get(),
                 Scanners.player("プレーヤーB", false).get(),
                 Scanners.millisInGame.get(),
-                Scanners.millisInTurn.get(),
+                Scanners.millisAtTurn.get(),
                 Scanners.times.get(),
                 Scanners.automatic.get()
         )
@@ -56,7 +56,7 @@ class Match(
             println("\tプレーヤーA : ${playerA.qualifiedName}\n" +
                     "\tプレーヤーB : ${playerB.qualifiedName}\n" +
                     "\tゲーム内の総持ち時間（ミリ秒） : $millisInGame\n" +
-                    "\t一手当たりの制限時間（ミリ秒） : $millisInTurn\n" +
+                    "\t一手当たりの制限時間（ミリ秒） : $millisAtTurn\n" +
                     "\t対戦回数 : $times\n" +
                     "> ")
             if (automatic) println() else readLine()
@@ -69,7 +69,7 @@ class Match(
                     playerBlack = if (colorA === Color.BLACK) playerA else playerB,
                     playerWhite = if (colorA === Color.BLACK) playerB else playerA,
                     millisInGame = millisInGame,
-                    millisInTurn = millisInTurn,
+                    millisAtTurn = millisAtTurn,
                     automatic = true,
                     silent = true
             ).play()

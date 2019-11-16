@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
  *
  * @param players 総当たり戦に参加するプレーヤー
  * @param millisInGame ゲーム内の各プレーヤーの持ち時間（ミリ秒）
- * @param millisInTurn 一手当たりの制限時間（ミリ秒）
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  * @param times 一組ごとの対戦回数
  * @param silent 標準出力への出力なしで進行させる場合は true。
  *               一マッチごとの状態をインタラクティブに出力しながら進行する場合は false
@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 class League(
         private val players: List<KClass<out Player>>,
         private val millisInGame: Long,
-        private val millisInTurn: Long,
+        private val millisAtTurn: Long,
         private val times: Int,
         private val silent: Boolean = false
 ) : Playable<Unit> {
@@ -28,7 +28,7 @@ class League(
         override fun arrangeViaConsole(): League = League(
                 arrangePlayers(),
                 Scanners.millisInGame.get(),
-                Scanners.millisInTurn.get(),
+                Scanners.millisAtTurn.get(),
                 Scanners.times.get()
         )
     }
@@ -46,7 +46,7 @@ class League(
                 println("\tプレーヤー${'A' + idx} ： ${kClass.qualifiedName}")
             }
             println("\tゲーム内の総持ち時間（ミリ秒） : $millisInGame")
-            println("\t一手当たりの制限時間（ミリ秒） : $millisInTurn")
+            println("\t一手当たりの制限時間（ミリ秒） : $millisAtTurn")
             println("\t対戦回数 ： $times\n")
         }
 
@@ -61,7 +61,7 @@ class League(
                         playerA = playerX,
                         playerB = playerY,
                         millisInGame = millisInGame,
-                        millisInTurn = millisInTurn,
+                        millisAtTurn = millisAtTurn,
                         times = times,
                         automatic = true,
                         silent = true

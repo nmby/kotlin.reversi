@@ -14,7 +14,7 @@ import xyz.hotchpotch.reversi.puttables
  */
 class RandomPlayer(private val color: Color) : Player {
     companion object : PlayerFactory {
-        override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
+        override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
                 RandomPlayer(color)
     }
 

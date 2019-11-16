@@ -14,13 +14,13 @@ private const val MARGIN: Long = 20
  * モンテカルロシミュレーションで最も勝率が高い手を選択するプレーヤーです。
  *
  * @param color このプレーヤーの石の色
- * @param millisInTurn 一手当たりの制限時間（ミリ秒）
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  */
-class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long) : Player {
+class MonteCarloPlayer(private val color: Color, private val millisAtTurn: Long) : Player {
 
     companion object : PlayerFactory {
-        override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
-                MonteCarloPlayer(color, millisInTurn)
+        override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
+                MonteCarloPlayer(color, millisAtTurn)
     }
 
     /**
@@ -65,7 +65,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         // このロジックは凝ろうと思えば色々と凝れるし、それで強くもなるが、
         // 面倒くさいので一旦これで
         val remainedMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
-        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainedMyTurns) - MARGIN
+        val millisForThisTurn: Long = min(millisAtTurn, millisInGame / remainedMyTurns) - MARGIN
         return now.plusMillis(millisForThisTurn)
     }
 
