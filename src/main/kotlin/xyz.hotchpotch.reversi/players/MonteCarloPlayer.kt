@@ -30,10 +30,10 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
 
         // 石を置ける位置が0（パス）または1の場合は、直ちに手が決まる。
-        val puttables = board.puttables(color)
+        val puttables: Set<Point> = board.puttables(color)
         when (puttables.size) {
             0 -> return null
-            1 -> return puttables[0]
+            1 -> return puttables.first()
         }
 
         val records: Map<Point, Record> = puttables.associateWith { Record() }
@@ -54,7 +54,8 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
 
         // 最も成績の良かった手を選択して返す。
         // max() を使うと同成績の位置が複数あったときに結果が偏る。
-        // 特に一度もプレイアウトを行えなかった場合のことも考慮し、同率一位の中からランダムに選択することとする。
+        // 特に一度もプレイアウトを行えなかった場合にすべての手が同率一位になることも考慮し、
+        // 同率一位の中からランダムに選択することとする。
         val bestRecord: Record = records.map { it.value }.max()!!
         return records.filter { bestRecord <= it.value }.keys.random()
     }
@@ -79,7 +80,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     private tailrec fun playOut(board: MutableBoard, currTurn: Color): Color? {
         if (!board.isGameOngoing()) return board.winner()
 
-        val puttables = board.puttables(currTurn)
+        val puttables: Set<Point> = board.puttables(currTurn)
         if (puttables.isNotEmpty()) board.apply(Move(currTurn, puttables.random()))
         return playOut(board, currTurn.reversed())
     }

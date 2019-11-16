@@ -27,9 +27,9 @@ fun Board.canApply(move: Move): Boolean = isGameOngoing()
 // 「プッタブル」っていうと金融デリバティブ商品みたいだけど。
 // お勉強MEMO:
 // こういうAPIの戻り値型をどうするか悩む。この場合は本質的に Set であるべきだが、
-// 使う側は List の方が便利なんだろうな。今回は List にしてみる。
-fun Board.puttables(color: Color): List<Point> =
-        Point.values.filter { canPutAt(color, it) }
+// 使う側は List の方が便利なんだろうな。今回は Set にしてみる。
+fun Board.puttables(color: Color): Set<Point> =
+        Point.values.filter { canPutAt(color, it) }.toSet()
 
 /**
  * このリバーシ盤の指定された位置に指定された色の石を置いた場合に

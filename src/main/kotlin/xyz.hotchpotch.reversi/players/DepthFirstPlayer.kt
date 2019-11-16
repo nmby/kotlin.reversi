@@ -19,12 +19,12 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
     private lateinit var deadline: Instant
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
-        val puttables: List<Point> = board.puttables(color)
+        val puttables: Set<Point> = board.puttables(color)
 
         // 選べる手が0や1の場合は、探索を行わずに直ちに決定する。
         when (puttables.size) {
             0 -> return null
-            1 -> return puttables[0]
+            1 -> return puttables.first()
         }
 
         deadline = deadline(board, millisInGame)
@@ -57,12 +57,12 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
         // 時間切れの場合は探索を切り上げる。
         if (deadline < Instant.now()) throw TimeUpException()
 
-        val puttables: List<Point> = board.puttables(currColor)
+        val puttables: Set<Point> = board.puttables(currColor)
 
         // パスの場合は次に委ねる。
         if (puttables.isEmpty()) return null to search(board, currColor.reversed()).second
 
-        val drawPoints: MutableList<Point> = mutableListOf()
+        val drawPoints: MutableSet<Point> = mutableSetOf()
         puttables.forEach {
 
             // お勉強MEMO:
