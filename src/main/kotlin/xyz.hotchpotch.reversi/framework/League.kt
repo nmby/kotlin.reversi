@@ -50,8 +50,8 @@ class League(
             println("\t対戦回数 ： $times\n")
         }
 
-        (0 until players.lastIndex).forEach { i ->
-            (i + 1..players.lastIndex).forEach { j ->
+        for (i in 0 until players.lastIndex) {
+            for (j in i + 1..players.lastIndex) {
                 val playerX: KClass<out Player> = players[i]
                 val playerY: KClass<out Player> = players[j]
 

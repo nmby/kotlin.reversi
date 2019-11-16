@@ -52,8 +52,8 @@ class Match(
         { "Matchクラスはいわゆるワンショットです。対戦ごとに新たなインスタンスを利用してください。" }
 
         if (!silent) {
-            println("\n対戦を開始します。")
-            println("\tプレーヤーA : ${playerA.qualifiedName}\n" +
+            print("\n対戦を開始します。\n")
+            print("\tプレーヤーA : ${playerA.qualifiedName}\n" +
                     "\tプレーヤーB : ${playerB.qualifiedName}\n" +
                     "\tゲーム内の総持ち時間（ミリ秒） : $millisInGame\n" +
                     "\t一手当たりの制限時間（ミリ秒） : $millisAtTurn\n" +
@@ -62,8 +62,8 @@ class Match(
             if (automatic) println() else readLine()
         }
 
-        (1..times).forEach {
-            if (!silent) println("\n${it}回戦目（A=${colorA}, B=${colorA.reversed()}）\n")
+        for (n in 1..times) {
+            if (!silent) println("\n${n}回戦目（A=${colorA}, B=${colorA.reversed()}）\n")
 
             val gameResult: GameResult = Game(
                     playerBlack = if (colorA === Color.BLACK) playerA else playerB,
