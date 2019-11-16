@@ -25,7 +25,7 @@ class Match(
         private val times: Int,
         private val automatic: Boolean = false,
         private val silent: Boolean = false
-) : Playable<Map<KClass<out Player>, Record>> {
+) : Playable {
 
     companion object : PlayableFactory<Match> {
 
@@ -47,7 +47,7 @@ class Match(
     /** プレーヤーAの色（一ゲームごとに切り替える。） */
     private var colorA: Color = Color.BLACK
 
-    override fun play(): Map<KClass<out Player>, Record> {
+    override fun play(): MatchResult {
         check(recordA.totalPlays == 0)
         { "Matchクラスはいわゆるワンショットです。対戦ごとに新たなインスタンスを利用してください。" }
 
@@ -93,18 +93,31 @@ class Match(
             colorA = colorA.reversed()
         }
 
-        if (!silent) {
-            println("\n総合成績：")
-            println("\tAの勝ち：${recordA.wins}, 引き分け：${recordA.draws}, Bの勝ち：${recordA.losses}")
-            println(when {
-                recordA.losses < recordA.wins -> "\tAの勝ちです。"
-                recordA.wins < recordA.losses -> "\tBの勝ちです。"
-                else -> "\t引き分けです。"
-            })
-        }
-        return mapOf(
+        val result = MatchResult(
                 playerA to recordA,
-                playerB to recordA.opposite()
-        )
+                playerB to recordA.opposite())
+
+        if (!silent) println(result.announce)
+
+        return result
+    }
+}
+
+class MatchResult(
+        blackRecord: Pair<KClass<out Player>, Record>,
+        whiteRecord: Pair<KClass<out Player>, Record>
+) : Result {
+
+    private val records: Map<KClass<out Player>, Record> = mapOf(blackRecord, whiteRecord)
+
+    fun record(player: KClass<out Player>): Record? = records[player]
+
+    override val announce: String = with(blackRecord.second) {
+        "\n総合成績：\n\tAの勝ち：${wins}, 引き分け：${draws}, Bの勝ち：${losses}\n" +
+                when {
+                    losses < wins -> "\tAの勝ちです。"
+                    wins < losses -> "\tBの勝ちです。"
+                    else -> "\t引き分けです。"
+                }
     }
 }

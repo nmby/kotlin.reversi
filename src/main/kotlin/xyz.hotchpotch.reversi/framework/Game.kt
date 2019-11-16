@@ -24,7 +24,7 @@ class Game(
         private val millisAtTurn: Long,
         private val automatic: Boolean = false,
         private val silent: Boolean = false
-) : Playable<GameResult> {
+) : Playable {
 
     companion object : PlayableFactory<Game> {
 
@@ -175,8 +175,7 @@ class Game(
  * @param board ゲーム終了時点のリバーシ盤
  */
 // お勉強MEMO: 実験として sealed class を使ってみる。
-sealed class GameResult(val winner: Color?, val board: Board) {
-    abstract val announce: String
+sealed class GameResult(val winner: Color?, val board: Board) : Result {
 
     /**
      * 通常のゲーム終了（双方石を置ける場所がなくなったこと）により決着が付いた場合のゲーム結果を表します。

@@ -16,7 +16,7 @@ fun main() {
             }
             .joinToString("\n")
 
-    val selectMenu: ConsoleScanner<KClass<out Playable<*>>> = ConsoleScanner.forList(
+    val selectMenu: ConsoleScanner<KClass<out Playable>> = ConsoleScanner.forList(
             list = Playable.types,
             prompt = "${menuList}\n番号で選択してください > "
     )
@@ -32,10 +32,8 @@ fun main() {
 
 /**
  * 「遊べるもの」（例えば、2プレーヤーが1回対戦する「ゲーム」や、複数のプレーヤーが総当たり戦を行う「リーグ」）を表します。
- *
- * @param T 結果の型
  */
-interface Playable<out T> {
+interface Playable {
 
     companion object {
 
@@ -45,12 +43,12 @@ interface Playable<out T> {
         // と思って一度してみたものの、
         // 全実装クラスをここに記述しなくてはならず不細工になる割には旨味が少ないので、やめた。
         // 本当はリフレクションで実現できると良いのだろうけど、今回はこれで良しとする。
-        val types: List<KClass<out Playable<*>>> = listOf(Game::class, Match::class, League::class)
+        val types: List<KClass<out Playable>> = listOf(Game::class, Match::class, League::class)
             get() = field.toList()
     }
 
     /** この [Playable] を実行して結果を返します。 */
-    fun play(): T
+    fun play(): Result
 }
 
 /**
@@ -58,11 +56,20 @@ interface Playable<out T> {
  *
  * @param T [Playable] 実装クラスの型
  */
-interface PlayableFactory<out T : Playable<Any?>> {
+interface PlayableFactory<out T : Playable> {
 
     /** この [Playable] の説明 */
     val description: String
 
     /** 標準入出力から実行条件を取得して [Playable] オブジェクトを生成するファクトリ */
     fun arrangeViaConsole(): T
+}
+
+/**
+ * [Playable.play] の実行結果を表します。
+ */
+interface Result {
+
+    /** 結果を表す文字列 */
+    val announce: String
 }
