@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
  *
  * @param players 総当たり戦に参加するプレーヤー
  * @param millisInGame ゲーム内の各プレーヤーの持ち時間（ミリ秒）
- * @param millisInTurn 一手当たりの制限時間（ミリ秒）
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  * @param times 一組ごとの対戦回数
  * @param silent 標準出力への出力なしで進行させる場合は true。
  *               一マッチごとの状態をインタラクティブに出力しながら進行する場合は false
@@ -16,10 +16,10 @@ import kotlin.reflect.KClass
 class League(
         private val players: List<KClass<out Player>>,
         private val millisInGame: Long,
-        private val millisInTurn: Long,
+        private val millisAtTurn: Long,
         private val times: Int,
         private val silent: Boolean = false
-) : Playable<Unit> {
+) : Playable {
 
     companion object : PlayableFactory<League> {
 
@@ -28,7 +28,7 @@ class League(
         override fun arrangeViaConsole(): League = League(
                 arrangePlayers(),
                 Scanners.millisInGame.get(),
-                Scanners.millisInTurn.get(),
+                Scanners.millisAtTurn.get(),
                 Scanners.times.get()
         )
     }
@@ -36,7 +36,7 @@ class League(
     /** プレーヤーごとの対戦成績 */
     private val records: MutableMap<Pair<KClass<out Player>, KClass<out Player>>, Record> = mutableMapOf()
 
-    override fun play() {
+    override fun play(): LeagueResult {
         check(records.values.all { it.totalPlays == 0 })
         { "Leagueクラスはいわゆるワンショットです。総当たり戦ごとに新たなインスタンスを利用してください。" }
 
@@ -46,32 +46,28 @@ class League(
                 println("\tプレーヤー${'A' + idx} ： ${kClass.qualifiedName}")
             }
             println("\tゲーム内の総持ち時間（ミリ秒） : $millisInGame")
-            println("\t一手当たりの制限時間（ミリ秒） : $millisInTurn")
+            println("\t一手当たりの制限時間（ミリ秒） : $millisAtTurn")
             println("\t対戦回数 ： $times\n")
         }
 
-        (0 until players.lastIndex).forEach { i ->
-            (i + 1..players.lastIndex).forEach { j ->
+        for (i in 0 until players.lastIndex) {
+            for (j in i + 1..players.lastIndex) {
                 val playerX: KClass<out Player> = players[i]
                 val playerY: KClass<out Player> = players[j]
 
                 if (!silent) print("${'A' + i} vs ${'A' + j} ...  ")
 
-                val match = Match(
+                val result: MatchResult = Match(
                         playerA = playerX,
                         playerB = playerY,
                         millisInGame = millisInGame,
-                        millisInTurn = millisInTurn,
+                        millisAtTurn = millisAtTurn,
                         times = times,
                         automatic = true,
                         silent = true
-                )
-                val result: Map<KClass<out Player>, Record> = match.play()
-                // お勉強MEMO：
-                // IntelliJ が 「result[playerX]!!」 に対して文句を言うので、
-                // 「result[playerX] ?: error("～")」 に変更した。
-                // null にはならないことを実装者は知っている訳だが、どうにかならないかしら。
-                val xRecord: Record = result[playerX] ?: error("nullな訳ないんだが・・・")
+                ).play()
+
+                val xRecord: Record = result.record(playerX)!!
 
                 if (!silent) {
                     println("${'A' + i}の勝ち：${xRecord.wins}, " +
@@ -84,40 +80,49 @@ class League(
             }
         }
 
-        if (!silent) {
-            println("\n総合成績（勝ち/分け/負け）：")
-            print((0..players.lastIndex).joinToString("") { "\t[ 対 ${'A' + it} ]" })
-            println("\t[ TOTAL ]")
+        val result = LeagueResult(players, records)
 
-            val totalRecords: MutableMap<KClass<out Player>, Record> = mutableMapOf()
-            val str: StringBuilder = StringBuilder()
+        if (!silent) println(result.announce)
 
-            // MEMO: こういうのは無理にFunctionalにしなくて良いじゃん、手続き型ループで良いじゃん、 と思っている。
-            (0..players.lastIndex).forEach { i ->
-                val playerX: KClass<out Player> = players[i]
-                val xTotalRecord = Record()
-                str.append("[${'A' + i}]")
-
-                (0..players.lastIndex).forEach { j ->
-                    if (i == j) {
-                        str.append("\t(-/-/-)")
-                    } else {
-                        val playerY: KClass<out Player> = players[j]
-                        val xRecord: Record = records[playerX to playerY]!!
-                        str.append("\t(%d/%d/%d)".format(xRecord.wins, xRecord.draws, xRecord.losses))
-                        xTotalRecord.add(xRecord)
-                    }
-                }
-
-                str.append("\t%d(%.1f%%) / %d(%.1f%%) / %d(%.1f%%)\n".format(
-                        xTotalRecord.wins, xTotalRecord.winRatio * 100,
-                        xTotalRecord.draws, xTotalRecord.drawRatio * 100,
-                        xTotalRecord.losses, xTotalRecord.lossRatio * 100))
-                totalRecords[playerX] = xTotalRecord
-            }
-            print(str)
-        }
+        return result
     }
+}
+
+class LeagueResult(
+        players: List<KClass<out Player>>,
+        records: Map<Pair<KClass<out Player>, KClass<out Player>>, Record>
+) : Result {
+
+    override val announce: String = {
+        val str: StringBuilder = StringBuilder()
+        str.appendln()
+        str.appendln("総合成績（勝ち/分け/負け）：")
+        str.append((0..players.lastIndex).joinToString("") { "\t[ 対 ${'A' + it} ]" })
+        str.appendln("\t[ TOTAL ]")
+
+        for (i in 0..players.lastIndex) {
+            val playerX: KClass<out Player> = players[i]
+            val xTotalRecord = Record()
+            str.append("[${'A' + i}]")
+
+            for (j in 0..players.lastIndex) {
+                if (i == j) {
+                    str.append("\t(-/-/-)")
+                } else {
+                    val playerY: KClass<out Player> = players[j]
+                    val xRecord: Record = records[playerX to playerY]!!
+                    str.append("\t(%d/%d/%d)".format(xRecord.wins, xRecord.draws, xRecord.losses))
+                    xTotalRecord.add(xRecord)
+                }
+            }
+
+            str.append("\t%d(%.1f%%) / %d(%.1f%%) / %d(%.1f%%)".format(
+                    xTotalRecord.wins, xTotalRecord.winRatio * 100,
+                    xTotalRecord.draws, xTotalRecord.drawRatio * 100,
+                    xTotalRecord.losses, xTotalRecord.lossRatio * 100))
+        }
+        str.toString()
+    }()
 }
 
 /** 総当たり戦に参加させるプレーヤーを標準入出力を介してアレンジします。 */

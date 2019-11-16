@@ -16,7 +16,7 @@ private val posRegex: Regex = "[a-%c][1-%d]".format('a' + Point.WIDTH - 1, Point
  */
 class ManualPlayer(private val color: Color, private val safety: Boolean = false) : Player {
     companion object : PlayerFactory {
-        override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
+        override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
                 ManualPlayer(color)
     }
 

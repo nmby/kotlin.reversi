@@ -12,7 +12,7 @@ interface Board {
 
 // お勉強MEMO:
 // インタフェースのメンバ関数でデフォルト実装を持つものについて、
-// インタフェース定義と同一ファイル内で拡張関数として実装した方が良いのはどんな場合か？？
+// 拡張関数として実装した方が良いのはどんな場合か？？
 //   - private にしたいものは拡張として実装（これは確定）
 //   - オーバーライドを期待しないものは拡張として実装
 //   - オーバーライドを期待するものはインタフェースのメンバとして実装
@@ -60,7 +60,7 @@ fun Board.toMutableBoard(): MutableBoard = mutableBoardOf(this)
 interface MutableBoard : Board {
 
     /**
-     * 指定された手を適用してこのリバーシ版を更新します。
+     * 指定された手を適用してこのリバーシ盤を更新します。
      * @throws IllegalArgumentException 適用できない手が指定された場合
      */
     fun apply(move: Move)
@@ -95,6 +95,7 @@ private val initMap: Map<Point, Color> = mapOf(
 /**
  * 読み取り専用リバーシ盤の標準的な実装です。
  */
+// TODO: そのうちビット演算ベースの高パフォーマンス実装に切り替える
 private open class BoardImpl : Board {
 
     /** このリバーシ盤の石の配置を保持するマップ */
@@ -135,12 +136,14 @@ private open class BoardImpl : Board {
 
     override fun toString(): String {
         val str: StringBuilder = StringBuilder("  ")
-        (0 until Point.WIDTH).forEach { str.append('a' + it).append(' ') }
+        for (j in 0 until Point.WIDTH) {
+            str.append('a' + j).append(' ')
+        }
         str.appendln()
 
-        (0 until Point.HEIGHT).forEach { i ->
+        for (i in 0 until Point.HEIGHT) {
             str.append(i + 1).append(' ')
-            (0 until Point.WIDTH).forEach { j ->
+            for (j in 0 until Point.WIDTH) {
                 str.append(get(Point[i, j]) ?: "・")
             }
             str.appendln()

@@ -9,22 +9,28 @@ import java.time.Instant
 /** 今回の手に費やせる時間を計算する際の余裕代 */
 private const val MARGIN: Long = 20
 
-class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long) : Player {
+/**
+ * 深さ優先探索による必勝手を選択するプレーヤーです。
+ *
+ * @param color このプレーヤーの石の色
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
+ */
+class DepthFirstPlayer(private val color: Color, private val millisAtTurn: Long) : Player {
 
     companion object : PlayerFactory {
-        override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
-                DepthFirstPlayer(color, millisInTurn)
+        override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
+                DepthFirstPlayer(color, millisAtTurn)
     }
 
     private lateinit var deadline: Instant
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
-        val puttables: List<Point> = board.puttables(color)
+        val puttables: Set<Point> = board.puttables(color)
 
         // 選べる手が0や1の場合は、探索を行わずに直ちに決定する。
         when (puttables.size) {
             0 -> return null
-            1 -> return puttables[0]
+            1 -> return puttables.first()
         }
 
         deadline = deadline(board, millisInGame)
@@ -39,7 +45,7 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
     /** 今回の手に費やせる時間を計算し、探索を切り上げるデッドラインを返す。 */
     private fun deadline(board: Board, millisInGame: Long): Instant {
         val remainedMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
-        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainedMyTurns) - MARGIN
+        val millisForThisTurn: Long = min(millisAtTurn, millisInGame / remainedMyTurns) - MARGIN
         return Instant.now().plusMillis(millisForThisTurn)
     }
 
@@ -57,12 +63,12 @@ class DepthFirstPlayer(private val color: Color, private val millisInTurn: Long)
         // 時間切れの場合は探索を切り上げる。
         if (deadline < Instant.now()) throw TimeUpException()
 
-        val puttables: List<Point> = board.puttables(currColor)
+        val puttables: Set<Point> = board.puttables(currColor)
 
         // パスの場合は次に委ねる。
         if (puttables.isEmpty()) return null to search(board, currColor.reversed()).second
 
-        val drawPoints: MutableList<Point> = mutableListOf()
+        val drawPoints: MutableSet<Point> = mutableSetOf()
         puttables.forEach {
 
             // お勉強MEMO:

@@ -14,13 +14,13 @@ import xyz.hotchpotch.reversi.puttables
  */
 class RandomPlayer(private val color: Color) : Player {
     companion object : PlayerFactory {
-        override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
+        override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
                 RandomPlayer(color)
     }
 
     /** 石を置ける位置の中からランダムで手を選んで返します。 */
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
-        val puttables = board.puttables(color)
+        val puttables: Set<Point> = board.puttables(color)
         return if (puttables.isEmpty()) null else puttables.random()
     }
 }

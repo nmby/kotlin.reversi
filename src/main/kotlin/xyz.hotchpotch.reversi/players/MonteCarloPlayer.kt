@@ -14,13 +14,13 @@ private const val MARGIN: Long = 20
  * モンテカルロシミュレーションで最も勝率が高い手を選択するプレーヤーです。
  *
  * @param color このプレーヤーの石の色
- * @param millisInTurn 一手当たりの制限時間（ミリ秒）
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  */
-class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long) : Player {
+class MonteCarloPlayer(private val color: Color, private val millisAtTurn: Long) : Player {
 
     companion object : PlayerFactory {
-        override fun create(color: Color, millisInGame: Long, millisInTurn: Long): Player =
-                MonteCarloPlayer(color, millisInTurn)
+        override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
+                MonteCarloPlayer(color, millisAtTurn)
     }
 
     /**
@@ -30,10 +30,10 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
 
         // 石を置ける位置が0（パス）または1の場合は、直ちに手が決まる。
-        val puttables = board.puttables(color)
+        val puttables: Set<Point> = board.puttables(color)
         when (puttables.size) {
             0 -> return null
-            1 -> return puttables[0]
+            1 -> return puttables.first()
         }
 
         val records: Map<Point, Record> = puttables.associateWith { Record() }
@@ -54,7 +54,8 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
 
         // 最も成績の良かった手を選択して返す。
         // max() を使うと同成績の位置が複数あったときに結果が偏る。
-        // 特に一度もプレイアウトを行えなかった場合のことも考慮し、同率一位の中からランダムに選択することとする。
+        // 特に一度もプレイアウトを行えなかった場合にすべての手が同率一位になることも考慮し、
+        // 同率一位の中からランダムに選択することとする。
         val bestRecord: Record = records.map { it.value }.max()!!
         return records.filter { bestRecord <= it.value }.keys.random()
     }
@@ -64,7 +65,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
         // このロジックは凝ろうと思えば色々と凝れるし、それで強くもなるが、
         // 面倒くさいので一旦これで
         val remainedMyTurns = (Point.values.filter { board[it] === null }.count() + 1) / 2
-        val millisForThisTurn: Long = min(millisInTurn, millisInGame / remainedMyTurns) - MARGIN
+        val millisForThisTurn: Long = min(millisAtTurn, millisInGame / remainedMyTurns) - MARGIN
         return now.plusMillis(millisForThisTurn)
     }
 
@@ -79,7 +80,7 @@ class MonteCarloPlayer(private val color: Color, private val millisInTurn: Long)
     private tailrec fun playOut(board: MutableBoard, currTurn: Color): Color? {
         if (!board.isGameOngoing()) return board.winner()
 
-        val puttables = board.puttables(currTurn)
+        val puttables: Set<Point> = board.puttables(currTurn)
         if (puttables.isNotEmpty()) board.apply(Move(currTurn, puttables.random()))
         return playOut(board, currTurn.reversed())
     }

@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
  * @param playerA プレーヤーAのクラス
  * @param playerB プレーヤーBのクラス
  * @param millisInGame ゲーム内の各プレーヤーの持ち時間（ミリ秒）
- * @param millisInTurn 一手当たりの制限時間（ミリ秒）
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  * @param times 対戦回数
  * @param automatic 一ゲームごとに対話的に手を進める「対話モード」ではなく
  *                  自動でマッチ終了まで進める「自動モード」の場合は true
@@ -21,11 +21,11 @@ class Match(
         private val playerA: KClass<out Player>,
         private val playerB: KClass<out Player>,
         private val millisInGame: Long,
-        private val millisInTurn: Long,
+        private val millisAtTurn: Long,
         private val times: Int,
         private val automatic: Boolean = false,
         private val silent: Boolean = false
-) : Playable<Map<KClass<out Player>, Record>> {
+) : Playable {
 
     companion object : PlayableFactory<Match> {
 
@@ -35,7 +35,7 @@ class Match(
                 Scanners.player("プレーヤーA", false).get(),
                 Scanners.player("プレーヤーB", false).get(),
                 Scanners.millisInGame.get(),
-                Scanners.millisInTurn.get(),
+                Scanners.millisAtTurn.get(),
                 Scanners.times.get(),
                 Scanners.automatic.get()
         )
@@ -47,29 +47,29 @@ class Match(
     /** プレーヤーAの色（一ゲームごとに切り替える。） */
     private var colorA: Color = Color.BLACK
 
-    override fun play(): Map<KClass<out Player>, Record> {
+    override fun play(): MatchResult {
         check(recordA.totalPlays == 0)
         { "Matchクラスはいわゆるワンショットです。対戦ごとに新たなインスタンスを利用してください。" }
 
         if (!silent) {
-            println("\n対戦を開始します。")
-            println("\tプレーヤーA : ${playerA.qualifiedName}\n" +
+            print("\n対戦を開始します。\n")
+            print("\tプレーヤーA : ${playerA.qualifiedName}\n" +
                     "\tプレーヤーB : ${playerB.qualifiedName}\n" +
                     "\tゲーム内の総持ち時間（ミリ秒） : $millisInGame\n" +
-                    "\t一手当たりの制限時間（ミリ秒） : $millisInTurn\n" +
+                    "\t一手当たりの制限時間（ミリ秒） : $millisAtTurn\n" +
                     "\t対戦回数 : $times\n" +
                     "> ")
             if (automatic) println() else readLine()
         }
 
-        (1..times).forEach {
-            if (!silent) println("\n${it}回戦目（A=${colorA}, B=${colorA.reversed()}）\n")
+        for (n in 1..times) {
+            if (!silent) println("\n${n}回戦目（A=${colorA}, B=${colorA.reversed()}）\n")
 
             val gameResult: GameResult = Game(
                     playerBlack = if (colorA === Color.BLACK) playerA else playerB,
                     playerWhite = if (colorA === Color.BLACK) playerB else playerA,
                     millisInGame = millisInGame,
-                    millisInTurn = millisInTurn,
+                    millisAtTurn = millisAtTurn,
                     automatic = true,
                     silent = true
             ).play()
@@ -93,18 +93,31 @@ class Match(
             colorA = colorA.reversed()
         }
 
-        if (!silent) {
-            println("\n総合成績：")
-            println("\tAの勝ち：${recordA.wins}, 引き分け：${recordA.draws}, Bの勝ち：${recordA.losses}")
-            println(when {
-                recordA.losses < recordA.wins -> "\tAの勝ちです。"
-                recordA.wins < recordA.losses -> "\tBの勝ちです。"
-                else -> "\t引き分けです。"
-            })
-        }
-        return mapOf(
+        val result = MatchResult(
                 playerA to recordA,
-                playerB to recordA.opposite()
-        )
+                playerB to recordA.opposite())
+
+        if (!silent) println(result.announce)
+
+        return result
+    }
+}
+
+class MatchResult(
+        blackRecord: Pair<KClass<out Player>, Record>,
+        whiteRecord: Pair<KClass<out Player>, Record>
+) : Result {
+
+    private val records: Map<KClass<out Player>, Record> = mapOf(blackRecord, whiteRecord)
+
+    fun record(player: KClass<out Player>): Record? = records[player]
+
+    override val announce: String = with(blackRecord.second) {
+        "\n総合成績：\n\tAの勝ち：${wins}, 引き分け：${draws}, Bの勝ち：${losses}\n" +
+                when {
+                    losses < wins -> "\tAの勝ちです。"
+                    wins < losses -> "\tBの勝ちです。"
+                    else -> "\t引き分けです。"
+                }
     }
 }
