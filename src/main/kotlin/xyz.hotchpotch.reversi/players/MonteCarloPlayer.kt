@@ -8,10 +8,11 @@ import java.lang.Long.min
 import java.time.Instant
 
 /** 今回の手に費やせる時間を計算する際の余裕代 */
+// お勉強MEMO: トップレベルのconstにする意味ないかも。
 private const val MARGIN: Long = 20
 
 /**
- * モンテカルロシミュレーションで最も勝率が高い手を選択するプレーヤーです。
+ * モンテカルロ・シミュレーションにより最も勝率が高い手を選択するプレーヤーです。
  *
  * @param color このプレーヤーの石の色
  * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
@@ -24,7 +25,7 @@ class MonteCarloPlayer(private val color: Color, private val millisAtTurn: Long)
     }
 
     /**
-     * 石の置ける位置を候補手としてモンテカルロシミュレーションを行い、
+     * 石の置ける位置を候補手としてモンテカルロ・シミュレーションを行い、
      * 最も勝率の高い手を選択して返します。
      */
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
@@ -36,6 +37,7 @@ class MonteCarloPlayer(private val color: Color, private val millisAtTurn: Long)
             1 -> return puttables.first()
         }
 
+        // 候補手ごとの成績
         val records: Map<Point, Record> = puttables.associateWith { Record() }
 
         // 時間がある限り、思考（試行）を繰り返す。
@@ -43,7 +45,13 @@ class MonteCarloPlayer(private val color: Color, private val millisAtTurn: Long)
         while (Instant.now() < deadline) {
 
             puttables.forEach {
-                val record: Record = records[it]!!
+                val record: Record = records[it]
+                        // お勉強MEMO:
+                        // こういうMapからの取得について、どうするのが良いのだろう。
+                        // 「!!」をつけるのも下記のようにAssertionErrorを投げるのも野暮ったい。
+                        // records[it]がnotnullであることをコンパイラに伝える一番良い方法は？
+                        ?: throw AssertionError("nullはあり得ない")
+
                 when (playOut(mutableBoardOf(board + Move(color, it)), color.reversed())) {
                     color -> record.wins++
                     null -> record.draws++
@@ -53,7 +61,7 @@ class MonteCarloPlayer(private val color: Color, private val millisAtTurn: Long)
         }
 
         // 最も成績の良かった手を選択して返す。
-        // max() を使うと同成績の位置が複数あったときに結果が偏る。
+        // max() の結果をそのまま返すと同成績の位置が複数あったときに結果が偏る。
         // 特に一度もプレイアウトを行えなかった場合にすべての手が同率一位になることも考慮し、
         // 同率一位の中からランダムに選択することとする。
         val bestRecord: Record = records.map { it.value }.max()!!

@@ -162,6 +162,7 @@ private class MutableBoardImpl : BoardImpl, MutableBoard {
     override fun apply(move: Move) {
         require(canApply(move)) { "この手は適用できません。\n$this$move" }
         if (!move.isPass()) {
+            // パスでない場合は map の内容を更新する。
             val reversibles: Set<Point> = reversibles(move.color, move.point!!)
             reversibles.forEach { map[it] = move.color }
             map[move.point] = move.color
