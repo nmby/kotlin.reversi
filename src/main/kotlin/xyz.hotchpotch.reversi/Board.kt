@@ -60,7 +60,7 @@ fun Board.toMutableBoard(): MutableBoard = mutableBoardOf(this)
 interface MutableBoard : Board {
 
     /**
-     * 指定された手を適用してこのリバーシ版を更新します。
+     * 指定された手を適用してこのリバーシ盤を更新します。
      * @throws IllegalArgumentException 適用できない手が指定された場合
      */
     fun apply(move: Move)
@@ -135,7 +135,9 @@ private open class BoardImpl : Board {
 
     override fun toString(): String {
         val str: StringBuilder = StringBuilder("  ")
-        (0 until Point.WIDTH).forEach { str.append('a' + it).append(' ') }
+        for (j in 0 until Point.WIDTH) {
+            str.append('a' + j).append(' ')
+        }
         str.appendln()
 
         for (i in 0 until Point.HEIGHT) {

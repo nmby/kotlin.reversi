@@ -27,7 +27,7 @@ fun Board.canApply(move: Move): Boolean = isGameOngoing()
 // 「プッタブル」っていうと金融デリバティブ商品みたいだけど。
 // お勉強MEMO:
 // こういうAPIの戻り値型をどうするか悩む。この場合は本質的に Set であるべきだが、
-// 使う側は List の方が便利なんだろうな。今回は Set にしてみる。
+// 使う側は List の方が便利かもしれない。今回は Set にしてみる。
 fun Board.puttables(color: Color): Set<Point> =
         Point.values.filter { canPutAt(color, it) }.toSet()
 
@@ -35,10 +35,9 @@ fun Board.puttables(color: Color): Set<Point> =
  * このリバーシ盤の指定された位置に指定された色の石を置いた場合に
  * ひっくり返せる石の位置が格納されたセット（ひっくり返せる石がない場合は空のセット）を返します。
  */
-fun Board.reversibles(color: Color, point: Point): Set<Point> {
-    return if (this[point] !== null) emptySet()
-    else Direction.values().flatMap { reversibles(color, point, it) }.toSet()
-}
+fun Board.reversibles(color: Color, point: Point): Set<Point> =
+        if (this[point] !== null) emptySet()
+        else Direction.values().flatMap { reversibles(color, point, it) }.toSet()
 
 /**
  * このリバーシ盤の指定された位置に指定された色の石を置いた場合に、
@@ -47,13 +46,13 @@ fun Board.reversibles(color: Color, point: Point): Set<Point> {
 private fun Board.reversibles(color: Color, point: Point, direction: Direction): Set<Point> {
     assert(this[point] === null)
 
-    val points: MutableSet<Point> = mutableSetOf()
+    val reversibles: MutableSet<Point> = mutableSetOf()
     var p: Point? = point + direction
 
     while (p !== null) {
         when (this[p]) {
-            color -> return points
-            color.reversed() -> points.add(p)
+            color -> return reversibles
+            color.reversed() -> reversibles.add(p)
             else -> return emptySet()
         }
         p += direction

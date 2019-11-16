@@ -10,9 +10,9 @@ import kotlin.reflect.full.companionObjectInstance
 
 fun main() {
     val menuList: String = Playable.types
-            .mapIndexed { idx, clazz ->
-                "\t${idx + 1} : ${clazz.simpleName}" +
-                        " - ${(clazz.companionObjectInstance as PlayableFactory<*>).description}"
+            .mapIndexed { idx, type ->
+                val factory: PlayableFactory<*> = type.companionObjectInstance as PlayableFactory<*>
+                "\t${idx + 1} : ${type.simpleName} - ${factory.description}"
             }
             .joinToString("\n")
 

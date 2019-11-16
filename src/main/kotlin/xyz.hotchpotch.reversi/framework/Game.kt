@@ -71,8 +71,8 @@ class Game(
         { "Gameクラスはいわゆるワンショットです。ゲームごとに新たなインスタンスを利用してください。" }
 
         if (!silent) {
-            println("\nゲームを開始します。")
-            println("\t${Color.BLACK} : ${playerBlack.qualifiedName}\n" +
+            print("\nゲームを開始します。\n")
+            print("\t${Color.BLACK} : ${playerBlack.qualifiedName}\n" +
                     "\t${Color.WHITE} : ${playerWhite.qualifiedName}\n" +
                     "\tゲーム内の総持ち時間（ミリ秒） : $millisInGame\n" +
                     "\t一手当たりの制限時間（ミリ秒） : $millisAtTurn\n" +
@@ -86,6 +86,7 @@ class Game(
                 print("$currTurn の番です...  ")
             }
 
+            // お勉強MEMO:
             // あんまり広すぎる with は良くない。が、今回は実験ということで・・・
             // with の中身をコンパイル時ではなく実行時に指定できるのは便利そう。
             with(if (currTurn === Color.BLACK) blackProps else whiteProps) {
