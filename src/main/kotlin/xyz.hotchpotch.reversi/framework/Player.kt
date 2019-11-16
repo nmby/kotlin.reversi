@@ -24,7 +24,8 @@ interface Player {
                 RandomPlayer::class,
                 DepthFirstPlayer::class,
                 WidthFirstPlayer::class,
-                MonteCarloPlayer::class
+                MonteCarloPlayer::class,
+                MixedPlayer::class
         )
             // お勉強MEMO：
             // 可変オブジェクトをそのまま返す訳にはいかないので、
