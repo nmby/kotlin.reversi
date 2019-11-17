@@ -8,11 +8,12 @@ import xyz.hotchpotch.reversi.framework.Player
 import xyz.hotchpotch.reversi.framework.PlayerFactory
 
 /**
- * リバーシ盤を左上から順に走査し、石を置ける場所が見つかったらそれを自身の手とするプレーヤーです。
+ * リバーシ盤を左上から順に走査し、最初に見つかった手を選択するプレーヤーです。
  *
  * @param color このプレーヤーの石の色
  */
 class SimplestPlayer(private val color: Color) : Player {
+
     companion object : PlayerFactory {
         override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
                 SimplestPlayer(color)

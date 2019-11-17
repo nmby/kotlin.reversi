@@ -20,7 +20,7 @@ private const val MARGIN: Long = 30
 class WidthFirstPlayer(
         private val color: Color,
         private val millisAtTurn: Long,
-        private val evaluator: (Board, Color) -> Double = Evaluators::evaluateBoard5
+        private val evaluator: (Board, Color) -> Double = Evaluators::evaluateBoard6
 ) : Player {
 
     companion object : PlayerFactory {
@@ -30,11 +30,16 @@ class WidthFirstPlayer(
 
     override fun choosePoint(board: Board, millisInGame: Long): Point? {
         val root = Node(null, null, board, color)
+
+        // 探索すべきノードを保持するキュー。ここに格納されているノードのネクストノードを順に探索する。
+        // 現在の手番を表すルートノードから始めて、一手先のすべてを探索し終えたら二手先を、
+        // 二手先をすべて探索し終えたら三手先を、・・・　というように幅優先探索を行う。
         val nodesInProcess: Queue<Node> = ArrayDeque()
         nodesInProcess.add(root)
 
         val deadline: Instant = deadline(board, millisInGame)
         do {
+            // キューの先頭に格納されているノードの次のノードを探索し、それらをキューの末尾に追加する。
             val currNode: Node = nodesInProcess.remove()
             nodesInProcess.addAll(currNode.search())
         } while (nodesInProcess.isNotEmpty() && Instant.now() < deadline)
@@ -69,14 +74,15 @@ class WidthFirstPlayer(
         // そして探索の最先端ノードのリバーシ盤を評価関数で評価し、
         // ミニマックス法で直近ノードのスコアを算出して手を決める。
         //
-        // 本来、コストのかかるリバーシ盤の評価処理はリーフノード（最先端ノード）のみで実施べきだが、
+        // 本来、コストのかかるリバーシ盤の評価処理は、
+        // 時間切れで探索を終了した時点のリーフノード（最先端ノード）のみで実施べきだが、
         // 以下の理由から、途中ノードを含む全ノードで評価計算を行ってその都度親ノードに結果を遡及させる
         // という方法を採用した。
-        //   1.最後に一度に評価処理を行って時間切れになるリスクを減らすため
-        //   2.ソース簡略化のため
+        //   1.最後にまとめて評価処理を行うことによる時間切れリスクを減らすため
+        //   2.ソースコード簡略化のため
         //   3.お勉強としてobservableを使ってみたかったため
 
-        /** currColorにとって最も良い一手先の状態 */
+        /** 子ノードのうち、currColorから見て最も良いノード */
         // お勉強MEMO: observableを使ってみる。
         var bestChild: Node? by Delegates.observable<Node?>(null) { _, _, new ->
             // bestChildが更新された場合は、scoreも更新する。
@@ -85,7 +91,7 @@ class WidthFirstPlayer(
 
         /** このノードのcolorから見たスコア */
         // お勉強MEMO: observableを使ってみる。
-        var score: Double by Delegates.observable(evaluator.invoke(currBoard, color)) { _, old, new ->
+        var score: Double by Delegates.observable(evaluator(currBoard, color)) { _, _, _ ->
             // このノードのスコアが更新された場合は、親ノードのスコアも更新する。
             updateParentBest()
         }
@@ -94,7 +100,9 @@ class WidthFirstPlayer(
             // observableは初期値設定時は発火しないため、 initブロックでの処理が必要。
             // もうちょっとの工夫でもうちょっとスマートになる気がするんだけどなぁ・・・
             if (parent !== null) {
+                // 親ノードの bestChild が未設定の場合は、このノードを設定する。
                 if (parent.bestChild === null) parent.bestChild = this
+                // 既に bestChild が設定済みの場合は、新たに生成されたこのノードも踏まえて再評価を行う。
                 else updateParentBest()
             }
         }
@@ -102,6 +110,7 @@ class WidthFirstPlayer(
         private fun updateParentBest() {
             if (parent === null) return
             when {
+                // ミニマックス法
                 parent.currColor === color && parent.score < score -> parent.bestChild = this
                 parent.currColor !== color && score < parent.score -> parent.bestChild = this
             }
@@ -147,7 +156,7 @@ private object Evaluators {
 
     /**
      * [evaluateBoard1] と [evaluateBoard2] の混合でスコアを計算する評価関数です。
-     * ゲーム初期は [evaluateBoard2] に、
+     * ゲーム序盤は [evaluateBoard2] に、
      * ゲーム終盤は [evaluateBoard1] にウェイトを置いてスコアを算出します。
      */
     fun evaluateBoard3(board: Board, color: Color): Double {
@@ -166,7 +175,7 @@ private object Evaluators {
         assert(Point.HEIGHT == 8 && Point.WIDTH == 8)
 
         val weights: Array<Array<Int>> = arrayOf(
-                // この内容も根拠なし
+                // この内容も根拠なし。適当に置いた数字。
                 arrayOf(10, -3, 7, 5, 5, 7, -3, 10),
                 arrayOf(-3, -5, 3, 2, 2, 3, -5, -3),
                 arrayOf(7, 3, 8, 5, 5, 8, 3, 7),
@@ -185,5 +194,12 @@ private object Evaluators {
                 .map { weights[it.i][it.j] }
                 .sum()
         return (myScore - hisScore).toDouble()
+    }
+
+    /** この先決してひっくり返されることのない安定な石の数に基づいてスコアを計算する評価関数です。 */
+    fun evaluateBoard6(board: Board, color: Color): Double {
+        val stables: Set<Point> = stablePoints(board)
+        return (stables.count { board[it] === color } - stables.count { board[it] === color.reversed() })
+                .toDouble()
     }
 }

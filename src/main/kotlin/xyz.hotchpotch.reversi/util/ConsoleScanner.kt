@@ -197,7 +197,7 @@ class ConsoleScanner<out T>(
         while (true) {
             print(prompt)
             val input: String = readLine() ?: ""
-            if (judge.invoke(input)) return converter.invoke(input)
+            if (judge(input)) return converter(input)
             else print(caution)
         }
     }

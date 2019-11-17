@@ -14,7 +14,7 @@ private const val MARGIN: Long = 20
  *
  * @param color このプレーヤーの石の色
  * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
- * @param verbose 思考結果を標準出力に表示する場合は true
+ * @param verbose 思考結果を標準出力に表示する場合は true（デバッグ用）
  */
 class DepthFirstPlayer(
         private val color: Color,
@@ -35,7 +35,7 @@ class DepthFirstPlayer(
         // 選べる手が0や1の場合は、探索を行わずに直ちに決定する。
         when (puttables.size) {
             0 -> {
-                if (verbose) print("!")
+                if (verbose) print("?")
                 return null
             }
             1 -> {
@@ -47,12 +47,13 @@ class DepthFirstPlayer(
         deadline = deadline(board, millisInGame)
 
         return try {
-            // 深さ優先探索で手を読み切れた場合。
             val result: Pair<Point?, Color?> = search(board, color)
+
+            // 深さ優先探索で手を読み切れた場合。
             if (verbose) print(when (result.second) {
                 color -> "W"
-                null -> "D"
-                else -> "L"
+                color.reversed() -> "L"
+                else -> "D"
             })
             result.first
 
@@ -73,7 +74,7 @@ class DepthFirstPlayer(
     /**
      * 今後の推移を深さ優先探索で調べ、選択すべき手と、それによって得られる勝敗を返す。
      */
-    // お勉強MEMO:
+    // 実装MEMO:
     // Color? を返す設計から Pair<Point?, Color?> を返す設計に変更。
     // 変更前の方がパフォーマンスは良い。変更した理由は以下の2点。
     //   - Pair と分割代入を実験的に使ってみたかったため
@@ -102,6 +103,10 @@ class DepthFirstPlayer(
             // 引き分けに持ち込める場合は、その手を記録しておく。
             else if (winner === null) drawPoints.add(it)
         }
+
+        // 引き分けに持ち込める場合はそのような手の中からランダムで、
+        // 引き分けにも持ち込めない場合（相手が最善手を指し続ければ負け確定の場合）は
+        // 打てる手の中からランダムで選択する。
         return if (drawPoints.isNotEmpty()) drawPoints.random() to null
         else puttables.random() to currColor.reversed()
     }

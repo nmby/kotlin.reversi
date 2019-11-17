@@ -8,6 +8,9 @@ import xyz.hotchpotch.reversi.framework.PlayerFactory
 
 /**
  * ゲームの局面に応じて委託先Playerを切り替える混合プレーヤーです。
+ *
+ * @param color このプレーヤーの石の色
+ * @param millisAtTurn 一手当たりの制限時間（ミリ秒）
  */
 class MixedPlayer(color: Color, millisAtTurn: Long) : Player {
 

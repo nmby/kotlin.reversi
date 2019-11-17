@@ -22,6 +22,7 @@ interface Player {
         val aiPlayers: List<KClass<out Player>> = listOf(
                 SimplestPlayer::class,
                 RandomPlayer::class,
+                RuleBasedPlayer::class,
                 DepthFirstPlayer::class,
                 WidthFirstPlayer::class,
                 MonteCarloPlayer::class,

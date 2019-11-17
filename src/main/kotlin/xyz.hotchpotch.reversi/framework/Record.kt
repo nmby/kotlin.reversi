@@ -9,7 +9,7 @@ package xyz.hotchpotch.reversi.framework
 // 例えば、Mapのキーには使えないしSetにも入れるべきでないし、ソートした後に順序の妥当性が崩れるかもしれないし、etc...
 data class Record(var wins: Int = 0, var draws: Int = 0, var losses: Int = 0) : Comparable<Record> {
 
-    /** 総対戦回数（つまり勝ち、引き分け、負けの合計）を返します。 */
+    /** 総対戦回数（つまり勝ち、引き分け、負けの合計） */
     val totalPlays: Int
         get() = wins + losses + draws
 
@@ -35,6 +35,7 @@ data class Record(var wins: Int = 0, var draws: Int = 0, var losses: Int = 0) : 
         losses += other.losses
     }
 
+    /** この対戦成績と指定された対戦成績を合算したものを生成して返します。 */
     operator fun plus(other: Record): Record =
             Record(wins + other.wins, draws + other.draws, losses + other.losses)
 
