@@ -6,15 +6,23 @@ import xyz.hotchpotch.reversi.Point
 
 /** 指定されたリバーシ盤について、この先決してひっくり返されない石の位置を返します。 */
 fun stablePoints(board: Board): Set<Point> {
+
+    // 安定であることが判明した石の位置を記録するセット
     val stablePoints: MutableSet<Point> = mutableSetOf()
+
+    // まだ安定か安定でないかが未判明の石の位置を記録するセット
     val unclearPoints: MutableSet<Point> =
             Point.values.filter { board[it] !== null }.toMutableSet()
 
+    // 未判明の位置が無くなるまで繰り返す。
     while (unclearPoints.isNotEmpty()) {
         val results: Map<Point, Boolean?> =
                 unclearPoints.associateWith { isStable(board, stablePoints, unclearPoints, it) }
 
+        // 安定であることが判明したものは stablePoints に追加する。
         stablePoints.addAll(results.filter { it.value == true }.keys)
+
+        // 安定であるか安定でないかが判明したもの（つまり、引き続き未判明のもの以外）を unclearPoints から除く。
         unclearPoints.removeIf { results[it] !== null }
     }
     return stablePoints

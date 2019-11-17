@@ -4,6 +4,11 @@ import xyz.hotchpotch.reversi.*
 import xyz.hotchpotch.reversi.framework.Player
 import xyz.hotchpotch.reversi.framework.PlayerFactory
 
+/**
+ * 予めコーディングされた固有のロジックによって手を決定するプレーヤーです。
+ *
+ * @param color このプレーヤーの石の色
+ */
 class RuleBasedPlayer(private val color: Color) : Player {
 
     companion object : PlayerFactory {
