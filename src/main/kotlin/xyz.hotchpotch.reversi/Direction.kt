@@ -33,5 +33,8 @@ enum class Direction(internal val di: Int, internal val dj: Int, opposite: Lazy<
     UPPER_LEFT(-1, -1, lazy { LOWER_RIGHT });
 
     /** 自身と反対の方向 */
+    // お勉強MEMO: lazy を含む Delegation についてはもっと中身を理解する必要あり
     val opposite: Direction by opposite
+
+    operator fun unaryMinus(): Direction = opposite
 }
