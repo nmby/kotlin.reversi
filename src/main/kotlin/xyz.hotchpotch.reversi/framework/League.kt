@@ -94,34 +94,50 @@ class LeagueResult(
 ) : Result {
 
     override val announce: String = {
-        val str: StringBuilder = StringBuilder()
-        str.appendln()
-        str.appendln("総合成績（勝ち/分け/負け）：")
-        str.append((0..players.lastIndex).joinToString("") { "\t[ 対 ${'A' + it} ]" })
-        str.append("\t[ TOTAL ]")
+        val grid: Array<Array<String>> =
+                Array(players.size + 1) { Array(players.size + 2) { "" } }
 
+        // 表のタイトル行の設定
+        grid[0][0] = ""
+        (0..players.lastIndex).forEach { grid[0][it + 1] = "[ vs ${'A' + it} ]" }
+        grid[0][players.size + 1] = " [ TOTAL ]"
+
+        // 表の一覧部分（各プレーヤーの成績部分）の設定
         for (i in 0..players.lastIndex) {
             val playerX: KClass<out Player> = players[i]
             val xTotalRecord = Record()
-            str.append("\n[${'A' + i}]")
+            grid[i + 1][0] = "[${'A' + i}] "
 
             for (j in 0..players.lastIndex) {
                 if (i == j) {
-                    str.append("\t(-/-/-)")
+                    grid[i + 1][j + 1] = "(-/-/-)"
                 } else {
                     val playerY: KClass<out Player> = players[j]
                     val xRecord: Record = records[playerX to playerY] ?: throw AssertionError()
-                    str.append("\t(%d/%d/%d)".format(xRecord.wins, xRecord.draws, xRecord.losses))
+                    grid[i + 1][j + 1] = "(%d/%d/%d)".format(xRecord.wins, xRecord.draws, xRecord.losses)
                     xTotalRecord.add(xRecord)
                 }
             }
 
-            str.append("\t%d(%.1f%%) / %d(%.1f%%) / %d(%.1f%%)".format(
+            grid[i + 1][players.size + 1] = " %d(%.1f%%) / %d(%.1f%%) / %d(%.1f%%)".format(
                     xTotalRecord.wins, xTotalRecord.winRatio * 100,
                     xTotalRecord.draws, xTotalRecord.drawRatio * 100,
-                    xTotalRecord.losses, xTotalRecord.lossRatio * 100))
+                    xTotalRecord.losses, xTotalRecord.lossRatio * 100)
         }
-        str.toString()
+
+        // 各列の幅を調べる。
+        val widths = IntArray(players.size + 2)
+        for (j in 0..players.size + 1) {
+            widths[j] = (0..players.size).map { grid[it][j].length }.max()!!
+        }
+
+        grid.joinToString(
+                prefix = "\n総合成績（勝ち/分け/負け）：\n",
+                separator = "\n",
+                transform = {
+                    it.mapIndexed { idx, s -> s.padEnd(widths[idx]) }
+                            .joinToString(separator = "  ")
+                })
     }()
 }
 
