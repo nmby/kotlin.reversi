@@ -1,8 +1,7 @@
 package xyz.hotchpotch.reversi
 
+import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 
 internal class DirectionTest {
 
@@ -16,5 +15,17 @@ internal class DirectionTest {
         assertSame(Direction.UPPER_RIGHT, Direction.LOWER_LEFT.opposite)
         assertSame(Direction.RIGHT, Direction.LEFT.opposite)
         assertSame(Direction.LOWER_RIGHT, Direction.UPPER_LEFT.opposite)
+    }
+
+    @Test
+    fun unaryMinus() {
+        assertSame(Direction.LOWER, -Direction.UPPER)
+        assertSame(Direction.LOWER_LEFT, -Direction.UPPER_RIGHT)
+        assertSame(Direction.LEFT, -Direction.RIGHT)
+        assertSame(Direction.UPPER_LEFT, -Direction.LOWER_RIGHT)
+        assertSame(Direction.UPPER, -Direction.LOWER)
+        assertSame(Direction.UPPER_RIGHT, -Direction.LOWER_LEFT)
+        assertSame(Direction.RIGHT, -Direction.LEFT)
+        assertSame(Direction.LOWER_RIGHT, -Direction.UPPER_LEFT)
     }
 }

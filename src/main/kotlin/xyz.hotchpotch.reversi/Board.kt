@@ -144,7 +144,7 @@ private open class BoardImpl : Board {
         for (i in 0 until Point.HEIGHT) {
             str.append(i + 1).append(' ')
             for (j in 0 until Point.WIDTH) {
-                str.append(get(Point[i, j]) ?: "・")
+                str.append(get(Point[i, j]) ?: "・").append(" ")
             }
             str.appendln()
         }

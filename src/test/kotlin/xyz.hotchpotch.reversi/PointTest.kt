@@ -73,6 +73,15 @@ internal class PointTest {
     }
 
     @Test
+    fun minus() {
+        Point.values.forEach { p ->
+            Direction.values().forEach { d ->
+                assertSame(p + d.opposite, p - d)
+            }
+        }
+    }
+
+    @Test
     fun testToString() {
         ('a' until 'a' + Point.WIDTH).forEach { c ->
             ('1' until Point.HEIGHT.toChar()).forEach { n ->

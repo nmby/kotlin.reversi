@@ -76,6 +76,8 @@ class Point private constructor(private val ordinal: Int) : Comparable<Point> {
         return if (isValidIdx(ni, nj)) get(ni, nj) else null
     }
 
+    operator fun minus(direction: Direction): Point? = this + -direction
+
     override fun toString(): String = pos
 
     override fun compareTo(other: Point): Int = ordinal.compareTo(other.ordinal)
