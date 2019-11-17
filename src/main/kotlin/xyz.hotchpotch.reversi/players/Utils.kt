@@ -84,7 +84,7 @@ private fun isStable(
  * @param testee 検査対象の位置
  * @param direction 検査対象の方向
  */
-// TODO: アルゴリズムの不完全な点を改善する（結構難しい）
+// TODO: アルゴリズムの不完全な点を改善する（結構面倒臭い）
 //
 // 例えば次のような石の配置のとき、
 //
