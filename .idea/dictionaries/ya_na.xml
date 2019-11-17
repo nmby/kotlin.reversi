@@ -2,11 +2,14 @@
   <dictionary name="ya_na">
     <words>
       <w>availables</w>
+      <w>effectives</w>
       <w>intelli</w>
       <w>playables</w>
+      <w>puttable</w>
       <w>puttables</w>
       <w>reversibles</w>
       <w>tailrec</w>
+      <w>testee</w>
     </words>
   </dictionary>
 </component>

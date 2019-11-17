@@ -91,7 +91,7 @@ class WidthFirstPlayer(
 
         /** このノードのcolorから見たスコア */
         // お勉強MEMO: observableを使ってみる。
-        var score: Double by Delegates.observable(evaluator.invoke(currBoard, color)) { _, _, _ ->
+        var score: Double by Delegates.observable(evaluator(currBoard, color)) { _, _, _ ->
             // このノードのスコアが更新された場合は、親ノードのスコアも更新する。
             updateParentBest()
         }
