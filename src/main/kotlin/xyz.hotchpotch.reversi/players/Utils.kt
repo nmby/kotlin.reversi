@@ -4,7 +4,7 @@ import xyz.hotchpotch.reversi.Board
 import xyz.hotchpotch.reversi.Direction
 import xyz.hotchpotch.reversi.Point
 
-/** 指定されたリバーシ盤について、この先決してひっくり返されない石の位置を返します。 */
+/** 指定されたリバーシ盤上の、この先決してひっくり返されない石の位置を返します。 */
 fun stablePoints(board: Board): Set<Point> {
 
     // 安定であることが判明した石の位置を記録するセット
