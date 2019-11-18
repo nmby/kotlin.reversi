@@ -6,7 +6,7 @@ package xyz.hotchpotch.reversi
  * @property di 縦方向のベクトル
  * @property dj 横方向のベクトル
  */
-enum class Direction(internal val di: Int, internal val dj: Int, opposite: Lazy<Direction>) {
+enum class Direction(internal val di: Int, internal val dj: Int, lazyOpposite: Lazy<Direction>) {
 
     /** 上 */
     UPPER(-1, 0, lazy { LOWER }),
@@ -34,7 +34,7 @@ enum class Direction(internal val di: Int, internal val dj: Int, opposite: Lazy<
 
     /** 自身と反対の方向 */
     // お勉強MEMO: lazy を含む Delegation についてはもっと中身を理解する必要あり
-    val opposite: Direction by opposite
+    val opposite: Direction by lazyOpposite
 
     operator fun unaryMinus(): Direction = opposite
 }
