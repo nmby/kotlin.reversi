@@ -99,7 +99,7 @@ class WidthFirstPlayer(
         init {
             // observableは初期値設定時は発火しないため、 initブロックでの処理が必要。
             // もうちょっとの工夫でもうちょっとスマートになる気がするんだけどなぁ・・・
-            if (parent !== null) {
+            parent?.let {
                 // 親ノードの bestChild が未設定の場合は、このノードを設定する。
                 if (parent.bestChild === null) parent.bestChild = this
                 // 既に bestChild が設定済みの場合は、新たに生成されたこのノードも踏まえて再評価を行う。
@@ -107,8 +107,7 @@ class WidthFirstPlayer(
             }
         }
 
-        private fun updateParentBest() {
-            if (parent === null) return
+        private fun updateParentBest() = parent?.let {
             when {
                 // ミニマックス法
                 parent.currColor === color && parent.score < score -> parent.bestChild = this
