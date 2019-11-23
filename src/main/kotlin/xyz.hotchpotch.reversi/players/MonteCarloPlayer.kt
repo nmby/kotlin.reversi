@@ -78,7 +78,7 @@ class MonteCarloPlayer(private val color: Color, private val millisAtTurn: Long)
     }
 
     /**
-     * 指定されたリバーシ盤をランダムな手で更新し、末尾再帰的にゲーム終了まで進め、勝者の色を返します。
+     * 指定されたリバーシ盤をランダムな手で更新し、再帰的にゲーム終了まで進め、勝者の色を返します。
      *
      * @param board このプレイアウトのための変更可能リバーシ盤
      * @param currTurn 現在の手番の色

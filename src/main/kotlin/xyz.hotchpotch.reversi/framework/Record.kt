@@ -39,13 +39,11 @@ data class Record(var wins: Int = 0, var draws: Int = 0, var losses: Int = 0) : 
     operator fun plus(other: Record): Record =
             Record(wins + other.wins, draws + other.draws, losses + other.losses)
 
-    override fun compareTo(other: Record): Int {
+    override fun compareTo(other: Record): Int = when {
         // 成績が良い方を「大きい」と評価する。
-        return when {
-            winRatio != other.winRatio -> winRatio.compareTo(other.winRatio)
-            lossRatio != other.lossRatio -> -lossRatio.compareTo(other.lossRatio)
-            else -> 0
-        }
+        winRatio != other.winRatio -> winRatio.compareTo(other.winRatio)
+        lossRatio != other.lossRatio -> -lossRatio.compareTo(other.lossRatio)
+        else -> 0
     }
 
     override fun toString(): String =

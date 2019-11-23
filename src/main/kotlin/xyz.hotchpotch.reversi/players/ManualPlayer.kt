@@ -24,8 +24,8 @@ class ManualPlayer(private val color: Color, private val safety: Boolean = false
 
     /** 標準入力から手を得るためのスキャナー */
     private val scanner: ConsoleScanner<Point?> = ConsoleScanner(
-            judge = { it.toUpperCase() == "PASS" || posRegex.matches(it.toLowerCase()) },
-            converter = { if (it.toUpperCase() == "PASS") null else Point[it.toLowerCase()] },
+            judge = { s -> s.toLowerCase().let { it == "pass" || posRegex.matches(it) } },
+            converter = { s -> s.toLowerCase().let { if (it == "pass") null else Point[it] } },
             prompt = """手を選択してください。 "a1"～"%c%d" or "PASS" > """
                     .format('a' + Point.WIDTH - 1, Point.HEIGHT),
             caution = "入力形式が正しくありません。"
