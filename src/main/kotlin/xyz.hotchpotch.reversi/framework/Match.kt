@@ -32,8 +32,8 @@ class Match(
         override val description: String = "2プレーヤーで黒白を入れ替えながら複数回対戦します。"
 
         override fun arrangeViaConsole(): Match = Match(
-                Scanners.player("プレーヤーA", false).get(),
-                Scanners.player("プレーヤーB", false).get(),
+                Scanners.getPlayer("プレーヤーA", false),
+                Scanners.getPlayer("プレーヤーB", false),
                 Scanners.millisInGame.get(),
                 Scanners.millisAtTurn.get(),
                 Scanners.times.get(),

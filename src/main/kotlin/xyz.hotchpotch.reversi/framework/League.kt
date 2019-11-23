@@ -143,27 +143,39 @@ class LeagueResult(
 
 /** 総当たり戦に参加させるプレーヤーを標準入出力を介してアレンジします。 */
 private fun arrangePlayers(): List<KClass<out Player>> {
-    val selected: MutableSet<Int> = mutableSetOf()
+    val candidates: MutableList<KClass<out Player>> = Player.aiPlayers.toMutableList()
+    val participants: MutableSet<Int> = mutableSetOf()
 
     while (true) {
         val n: Int = ConsoleScanner.forInt(
                 startInclusive = 0,
-                endInclusive = Player.aiPlayers.size,
+                endInclusive = candidates.size + 1,
                 prompt = "\t0: (選択終了)\n" +
-                        Player.aiPlayers.mapIndexed { idx, clz ->
-                            "\t${if (selected.contains(idx)) "【選択済み】 " else ""}" +
-                                    "${idx + 1}: ${clz.qualifiedName}\n"
+                        candidates.mapIndexed { idx, clazz ->
+                            "\t${if (participants.contains(idx + 1)) "【選択済み】" else ""}" +
+                                    "${idx + 1}: ${clazz.qualifiedName}\n"
                         }.joinToString("") +
-                        "参加させるプレーヤーを番号で指定してください > "
+                        "\t${candidates.size + 1}: その他（自作プレーヤー）\n" +
+                        "参加させるプレーヤーを番号で指定してください > ",
+                caution = "番号が範囲外です。\n"
         ).get()
 
-        if (0 < n) {
-            if (selected.contains(n - 1)) selected.remove(n - 1) else selected.add(n - 1)
-        } else if (2 <= selected.size) {
-            break
-        } else {
-            println("2つ以上のプレーヤーを選択してください。")
+        when {
+            n in 1..candidates.size ->
+                if (participants.contains(n)) participants.remove(n) else participants.add(n)
+
+            n == candidates.size + 1 -> {
+                val customPlayer: KClass<out Player>? = Scanners.getCustomPlayer()
+                if (customPlayer !== null) {
+                    candidates.add(customPlayer)
+                    participants.add(n)
+                }
+            }
+
+            n == 0 && 2 <= participants.size ->
+                return candidates.filterIndexed { idx, _ -> participants.contains(idx + 1) }
+
+            n == 0 -> println("2つ以上のプレーヤーを選択してください。")
         }
     }
-    return selected.sorted().map { Player.aiPlayers[it] }
 }
