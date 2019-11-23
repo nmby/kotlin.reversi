@@ -34,7 +34,7 @@ class League(
     }
 
     /** プレーヤーごとの対戦成績 */
-    private val records: MutableMap<Pair<KClass<out Player>, KClass<out Player>>, Record> = mutableMapOf()
+    private val records: MutableMap<Pair<Int, Int>, Record> = mutableMapOf()
 
     override fun play(): LeagueResult {
         check(records.values.all { it.totalPlays == 0 })
@@ -75,8 +75,8 @@ class League(
                             "${'A' + j}の勝ち：${xRecord.losses}")
                 }
 
-                records[playerX to playerY] = xRecord
-                records[playerY to playerX] = xRecord.opposite()
+                records[i to j] = xRecord
+                records[j to i] = xRecord.opposite()
             }
         }
 
@@ -90,7 +90,7 @@ class League(
 
 class LeagueResult(
         players: List<KClass<out Player>>,
-        records: Map<Pair<KClass<out Player>, KClass<out Player>>, Record>
+        records: Map<Pair<Int, Int>, Record>
 ) : Result {
 
     override val announce: String = {
@@ -104,7 +104,6 @@ class LeagueResult(
 
         // 表の一覧部分（各プレーヤーの成績部分）の設定
         for (i in 0..players.lastIndex) {
-            val playerX: KClass<out Player> = players[i]
             val xTotalRecord = Record()
             grid[i + 1][0] = "[${'A' + i}] "
 
@@ -112,8 +111,7 @@ class LeagueResult(
                 if (i == j) {
                     grid[i + 1][j + 1] = "(-/-/-)"
                 } else {
-                    val playerY: KClass<out Player> = players[j]
-                    val xRecord: Record = records[playerX to playerY] ?: throw AssertionError()
+                    val xRecord: Record = records[i to j] ?: throw AssertionError()
                     grid[i + 1][j + 1] = "(%d/%d/%d)".format(xRecord.wins, xRecord.draws, xRecord.losses)
                     xTotalRecord.add(xRecord)
                 }
