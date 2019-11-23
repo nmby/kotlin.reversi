@@ -40,7 +40,7 @@ object Scanners {
         }
     }
 
-    private fun getCustomPlayer(): KClass<out Player>? {
+    fun getCustomPlayer(): KClass<out Player>? {
         print("プレーヤークラスの名前（例: xyz.hotchpotch.reversi.players.RandomPlayer）を入力してください > ")
         val className: String = readLine() ?: ""
         val clazz: KClass<out Any>
