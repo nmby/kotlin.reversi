@@ -30,7 +30,7 @@ class Point private constructor(private val ordinal: Int) : Comparable<Point> {
         const val WIDTH = 8
 
         /** 全ての [Point] インスタンスを保持するリスト */
-        val values: List<Point> = (0 until HEIGHT * WIDTH).map { Point(it) }
+        val values: List<Point> = (0 until HEIGHT * WIDTH).map(::Point)
             get() = field.toList()
 
         /** 全ての [Point] インスタンスを保持するマップ */
@@ -42,7 +42,7 @@ class Point private constructor(private val ordinal: Int) : Comparable<Point> {
          * @throws IndexOutOfBoundsException (i, j) が範囲外の場合
          */
         operator fun get(i: Int, j: Int): Point {
-            require(isValidIdx(i, j)) { "($i, $j)" }
+            if(!isValidIdx(i, j)) throw IndexOutOfBoundsException("($i, $j)")
             return values[idxToOrdinal(i, j)]
         }
 
@@ -55,7 +55,7 @@ class Point private constructor(private val ordinal: Int) : Comparable<Point> {
 
     // 実装MEMO:
     // i, j, pos は ordinal から都度計算して返すようにカスタムゲッターを定義しても良いのだが、
-    // Point インスタンスはせいぜい64個しか生成されないため、
+    // Point インスタンスはたかだか64個しか生成されないため、
     // 記憶域よりも都度演算の手間を省くことを優先させることにした。
     // めっちゃ利用されるはずだし。
 

@@ -20,8 +20,9 @@ fun Board.canPutAt(color: Color, point: Point): Boolean = this[point] === null
         && Direction.values().any { reversibles(color, point, it).isNotEmpty() }
 
 /** このリバーシ盤に指定された手を適用できる場合に true を返します。 */
-fun Board.canApply(move: Move): Boolean = isGameOngoing()
-        && if (move.isPass()) !canPut(move.color) else canPutAt(move.color, move.point!!)
+fun Board.canApply(move: Move): Boolean =
+        if (move.isPass()) !canPut(move.color) && canPut(move.color.reversed())
+        else canPutAt(move.color, move.point!!)
 
 /** このリバーシ盤上の指定された色の石を置ける位置が格納されたセットを返します。 */
 // 「プッタブル」っていうと金融デリバティブ商品みたいだけど。
