@@ -1,11 +1,36 @@
 package xyz.hotchpotch.reversi
 
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertSame
+import kotlin.test.*
 
 internal class PointTest {
+
+    @Test
+    fun testGet1() {
+        assertFailsWith(IndexOutOfBoundsException::class) { Point[-1, 0] }
+        assertFailsWith(IndexOutOfBoundsException::class) { Point[0, -1] }
+        assertFailsWith(IndexOutOfBoundsException::class) { Point[Point.HEIGHT, Point.WIDTH - 1] }
+        assertFailsWith(IndexOutOfBoundsException::class) { Point[Point.HEIGHT - 1, Point.WIDTH] }
+
+        // assertNotFail 的なやつ無いのかな？
+        assertTrue(Point[0, 0] is Point)
+        assertTrue(Point[Point.HEIGHT - 1, Point.WIDTH - 1] is Point)
+    }
+
+    @Test
+    fun testGet2() {
+        assertFailsWith(IllegalArgumentException::class) { Point[""] }
+        assertFailsWith(IllegalArgumentException::class) { Point["A1"] }
+        assertFailsWith(IllegalArgumentException::class) { Point["a0"] }
+        assertFailsWith(IllegalArgumentException::class) { Point["${'a' - 1}1"] }
+        assertFailsWith(IllegalArgumentException::class) { Point["${'a' + Point.WIDTH}${'1' + Point.HEIGHT - 1}"] }
+        assertFailsWith(IllegalArgumentException::class) { Point["${'a' + Point.WIDTH - 1}${'1' + Point.HEIGHT}"] }
+        assertFailsWith(IllegalArgumentException::class) { Point["xxxx"] }
+
+        // assertNotFail 的なやつ無いのかな？
+        assertTrue(Point["a1"] is Point)
+        assertTrue(Point["${'a' + Point.WIDTH - 1}${'1' + Point.HEIGHT - 1}"] is Point)
+    }
 
     @Test
     fun testInstance() {

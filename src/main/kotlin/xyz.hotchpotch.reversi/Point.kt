@@ -42,7 +42,7 @@ class Point private constructor(private val ordinal: Int) : Comparable<Point> {
          * @throws IndexOutOfBoundsException (i, j) が範囲外の場合
          */
         operator fun get(i: Int, j: Int): Point {
-            require(isValidIdx(i, j)) { "($i, $j)" }
+            if(!isValidIdx(i, j)) throw IndexOutOfBoundsException("($i, $j)")
             return values[idxToOrdinal(i, j)]
         }
 
