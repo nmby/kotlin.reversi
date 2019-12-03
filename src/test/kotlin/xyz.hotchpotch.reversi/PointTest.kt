@@ -34,8 +34,8 @@ internal class PointTest {
 
     @Test
     fun testInstance() {
-        (0 until Point.HEIGHT).forEach { i ->
-            (0 until Point.WIDTH).forEach { j ->
+        for (i in 0 until Point.HEIGHT) {
+            for (j in 0 until Point.WIDTH) {
                 val point: Point = Point[i, j]
 
                 // Point[i, j] と Point[pos] で同一インスタンスが取得できること
@@ -49,8 +49,8 @@ internal class PointTest {
         }
 
         // 逆パターンも一応テスト
-        ('a' until 'a' + Point.WIDTH).forEach { c ->
-            ('1' until Point.HEIGHT.toChar()).forEach { n ->
+        for (c in 'a' until 'a' + Point.WIDTH) {
+            for (n in '1' until Point.HEIGHT.toChar()) {
                 val pos = "$c$n"
                 val point: Point = Point[pos]
 
@@ -108,8 +108,8 @@ internal class PointTest {
 
     @Test
     fun testToString() {
-        ('a' until 'a' + Point.WIDTH).forEach { c ->
-            ('1' until Point.HEIGHT.toChar()).forEach { n ->
+        for (c in 'a' until 'a' + Point.WIDTH) {
+            for (n in '1' until Point.HEIGHT.toChar()) {
                 assertEquals("$c$n", Point["$c$n"].toString())
             }
         }
