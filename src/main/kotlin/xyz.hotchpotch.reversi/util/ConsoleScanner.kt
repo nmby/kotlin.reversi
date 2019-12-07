@@ -181,7 +181,7 @@ class ConsoleScanner<out T>(
                 question: String,
                 caution: String = DEFAULT_CAUTION
         ): ConsoleScanner<Boolean> = ConsoleScanner(
-                judge = { it.toLowerCase() == "y" || it.toLowerCase() == "n" },
+                judge = { s -> s.toLowerCase().let { it == "y" || it == "n" } },
                 converter = { it.toLowerCase() == "y" },
                 prompt = "$question [y/N] > ",
                 caution = caution

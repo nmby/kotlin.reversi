@@ -8,6 +8,7 @@ import kotlin.reflect.full.companionObjectInstance
 // 一つのファイルに複数の要素を詰め込むの、どう考えればよいんだろう。
 // 今回は実験として色々モリモリにしてみた。
 
+/** このアプリケーションのエントリポイント */
 fun main() {
     val menuList: String = Playable.types
             .mapIndexed { idx, type ->
