@@ -20,6 +20,7 @@ class MixedPlayer(color: Color, millisAtTurn: Long) : Player {
     }
 
     private val randomPlayer: Player = RandomPlayer(color)
+    private val ruleBasedPlayer: Player = RuleBasedPlayer(color)
     private val monteCarloPlayer: Player = MonteCarloPlayer(color, millisAtTurn)
     private val depthFirstPlayer: Player = DepthFirstPlayer(color, millisAtTurn)
 
@@ -29,9 +30,12 @@ class MixedPlayer(color: Color, millisAtTurn: Long) : Player {
         val player: Player = when {
 
             // 序盤はランダムに進めて持ち時間の温存を図る。
-            45 < blankCells -> randomPlayer
+            50 < blankCells -> randomPlayer
 
-            // 中盤はモンテカルロ・シミュレーションの強みを活かす。
+            // 前半は経験則が活きるはず。
+            35 < blankCells -> ruleBasedPlayer
+
+            // 後半はモンテカルロ・シミュレーションの強みを活かす。
             10 < blankCells -> monteCarloPlayer
 
             // 残り10手くらいになれば全読みが可能なため、深さ優先探索による必勝手読みに託す。

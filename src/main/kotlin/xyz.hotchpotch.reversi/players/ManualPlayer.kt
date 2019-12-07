@@ -17,6 +17,7 @@ private val posRegex: Regex = "[a-%c][1-%d]"
  *              　ルール違反で負けになることが分かりながらこのプレーヤーの手としてそのまま採用する場合は false。
  */
 class ManualPlayer(private val color: Color, private val safety: Boolean = false) : Player {
+    
     companion object : PlayerFactory {
         override fun create(color: Color, millisInGame: Long, millisAtTurn: Long): Player =
                 ManualPlayer(color)
