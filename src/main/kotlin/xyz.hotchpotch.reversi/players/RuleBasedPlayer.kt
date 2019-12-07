@@ -34,7 +34,7 @@ class RuleBasedPlayer(private val color: Color) : Player {
             Point[Point.HEIGHT - 1, 0],
             Point[0, Point.WIDTH - 1],
             Point[Point.HEIGHT - 1, Point.WIDTH - 1])
-            .filter { puttables.contains(it) }
+            .filter(puttables::contains)
             .let { if (it.isEmpty()) null else it.random() }
 
     /** 安定な石を増やせる手がある場合は、最も多く増やせる手を返します。 */
@@ -84,7 +84,7 @@ class RuleBasedPlayer(private val color: Color) : Player {
         )
 
         val pickOneRandom: (Set<Point>) -> Point? = { ps ->
-            ps.filter { puttables.contains(it) }
+            ps.filter(puttables::contains)
                     .let { if (it.isNotEmpty()) it.random() else null }
         }
 

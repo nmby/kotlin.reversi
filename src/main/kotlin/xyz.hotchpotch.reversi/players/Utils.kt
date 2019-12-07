@@ -49,7 +49,7 @@ private fun isStable(
         testee: Point
 ): Boolean? {
 
-    if (board[testee] === null) return false
+    assert(board[testee] !== null)
 
     val isStableInEachDirection: List<Boolean?> = Direction.values()
             .map { isStable(board, stablePoints, unclearPoints, testee, it) }
@@ -133,7 +133,7 @@ private fun isStable(
     if (!hasEmptyCellInTheDirection) return true
 
     // 反対方向を調べ、リバーシ盤の端であれば「安定である」と判断する。
-    val oppositeNext: Point? = testee + direction.opposite
+    val oppositeNext: Point? = testee - direction
     if (oppositeNext === null) return true
 
     // 反対方向に隣接するマスが自身の石でない場合（つまり、空もしくは相手の石の場合）は
