@@ -124,7 +124,7 @@ private open class BoardImpl : Board {
 
     override fun equals(other: Any?): Boolean = when (other) {
         is BoardImpl -> map == other.map
-        is Board -> map == other.toMap()
+        is Board -> Point.values.all { map[it] === other[it] }
         else -> false
     }
 
